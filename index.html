@@ -249,8 +249,8 @@
 
         .credits-text {
             transform: translateY(100%);
-            /* 放慢到30秒，更优雅 */
-            animation: scrollUp 30s linear forwards;
+            /* ==================== ⏱️ 放慢到40秒，更优雅 ==================== */
+            animation: scrollUp 40s linear forwards;
             font-family: 'Crimson Text', serif;
             font-size: 24px;
             line-height: 1.8;
@@ -345,14 +345,13 @@ const TEXT_DATA = {
         level1_complete: "【第一章：苏醒】\n你收集了这个区域的所有记忆碎片。建筑在回应你，墙壁上的星空开始流动，仿佛有什么要苏醒过来。\n\n" +
                          "这座地理实验室是人文学院下的卓越中心，于2005年落成，延续了自1922年SITC时代开始的地理学传承。地理学在丹绒马林有着非常重要的历史意义，因为它是最早教授给马来教师的核心科目之一，让他们理解地图绘制、自然资源和国家地缘政治。",
         level2_complete: "【第二章：追忆】\n随着更多记忆被修复，建筑的过去逐渐清晰。1922年的灵魂与2005年的新生命在此交织。\n\n" +
-                         "从设计角度来看，这座建筑保留了殖民美学，通过陡峭的屋顶结构和标志性的通风孔，同时在外墙加强了独特的浮雕，展示世界地图作为人类探索历史的象征。这种整合象征着知识从传统手工制图方法向现代地理信息系统（GIS）技术的转变。",
+                         "从设计角度来看，这座建筑保留了殖民美学，通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，同时在外墙加强了独特的浮雕(Arca Timbul)，展示世界地图作为人类探索历史的象征。这种整合象征着知识从传统手工制图方法向现代地理信息系统（GIS）技术的转变。",
         level3_complete: "【终章：传承】\n所有的记忆都已收集完成。这座建筑的情绪被彻底抚平，地理学的传承将永远延续。\n\n" +
                          "这座建筑的存在唤起了对知识连续性的敬畏，这种连续性提升国家地理教育已超过一个世纪。它傲然矗立，象征着将前辈教育工作者的奋斗怀旧与今天学生的学术抱负团结在一起的骄傲。对这种历史遗产的热爱增强了我们继续保护地球可持续性并提升地理学知识的决心，为了未来的一代。",
         next_btn: "继续",
         game_over: "意识迷失",
         btn_retry: "重新尝试",
         hit_warning: "OUCH! 小心那些黑影...",
-        // ==================== 🎬 中文谢幕文本 ====================
         ending_credits: `
             <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
             <p>【终章：传承】</p>
@@ -367,8 +366,9 @@ const TEXT_DATA = {
             <p>让他们理解地图绘制、自然资源和国家地缘政治。</p>
             <br><br>
             <p>从设计角度来看，这座建筑保留了殖民美学，</p>
-            <p>通过陡峭的屋顶结构和标志性的通风孔，</p>
-            <p>同时在外墙加强了独特的浮雕，展示世界地图作为人类探索历史的象征。</p>
+            <p>通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，</p>
+            <p>同时在外墙加强了独特的浮雕(Arca Timbul)，</p>
+            <p>展示世界地图作为人类探索历史的象征。</p>
             <br><br>
             <p>这种整合象征着知识从传统手工制图方法</p>
             <p>向现代地理信息系统（GIS）技术的转变。</p>
@@ -407,7 +407,6 @@ const TEXT_DATA = {
         game_over: "TAMAT PERMAINAN",
         btn_retry: "Cuba Lagi",
         hit_warning: "AWAS! Hantu itu...",
-        // ==================== 🎬 马来语谢幕文本 ====================
         ending_credits: `
             <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
             <p>【Bab Akhir: Warisan】</p>
@@ -466,7 +465,6 @@ const TEXT_DATA = {
         game_over: "GAME OVER",
         btn_retry: "Try Again",
         hit_warning: "OUCH! Watch out for those shadows...",
-        // ==================== 🎬 英语谢幕文本 ====================
         ending_credits: `
             <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
             <p>【Final Chapter: Legacy】</p>
@@ -509,10 +507,11 @@ const CTX = CANVAS.getContext('2d');
 const MASK_CANVAS = document.createElement('canvas');
 const MASK_CTX = MASK_CANVAS.getContext('2d', { willReadFrequently: true });
 
+// ==================== ⚡ 关卡速度配置：每关递增，越来越刺激 ====================
 const LEVEL_CONFIG = {
-    1: { p_speed: 2.5, g_speed: 1.0 },
-    2: { p_speed: 2.0, g_speed: 0.8 },
-    3: { p_speed: 1.8, g_speed: 0.7 }
+    1: { p_speed: 2.5, g_speed: 1.3 },  // 第一关：升级！鬼速度从1.0→1.3，更有挑战性
+    2: { p_speed: 2.8, g_speed: 1.3 },
+    3: { p_speed: 3.2, g_speed: 1.6 }   // 第三关：最高速度，最具挑战性
 };
 
 const PLAYER_SIZE = 24;
@@ -535,7 +534,16 @@ let animationFrame = 0;
 let lastAnimationTime = 0;
 let isMoving = false;
 
-let player = { x: 0, y: 0, dx: 0, dy: 0, invulnerable: 0, angle: 0 };
+// ==================== 🔧 死亡状态标记：确保只触发一次 ====================
+let player = { 
+    x: 0, 
+    y: 0, 
+    dx: 0, 
+    dy: 0, 
+    invulnerable: 0, 
+    angle: 0,
+    isDead: false
+};
 let ghosts = [];
 let dots = [];
 let bigStars = [];
@@ -583,7 +591,6 @@ function playSound(soundName) {
 
 function toggleMusic() {
     if (!bgMusicElement) return;
-    
     const btn = document.getElementById('music-btn');
     if (!btn) return;
     
@@ -610,6 +617,8 @@ function selectLang(lang) {
 }
 
 function initLevel(lvl) {
+    // ==================== 🔧 重置死亡状态 ====================
+    player.isDead = false;
     currentLevel = lvl;
     isPaused = true;
     gameRunning = false;
@@ -742,18 +751,25 @@ function setupGameWorld() {
     player.y = startPos.y;
     player.invulnerable = 0;
     player.angle = 0;
+    player.isDead = false;
 
     ghosts = [];
-    let ghostCount = currentLevel;
+    // ==================== ⚡ 难度升级：第一关有2个鬼，第二关3个，第三关4个 ====================
+    // 原来：let ghostCount = currentLevel;
+    let ghostCount = currentLevel + 1;
+    
     for(let i = 0; i < ghostCount; i++) {
-        let ghostSpawnX = CANVAS.width - 200;
-        let ghostSpawnY = 200 + i * 150;
+        // ==================== ⚡ 位置调整：鬼魂更靠近中心"隘口" ====================
+        // 原来：let ghostSpawnX = CANVAS.width - 200;
+        let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120; // 更靠近中心区域
+        let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80; // 在必经之路上形成交叉巡逻
+        
         let gPos = findSafeSpot(ghostSpawnX, ghostSpawnY, HITBOX_SIZE);
         
         let attempts = 0;
         while(checkCollision(gPos.x, gPos.y, HITBOX_SIZE) && attempts < 50) {
-            gPos.x = ghostSpawnX + (Math.random() - 0.5) * 200;
-            gPos.y = ghostSpawnY + (Math.random() - 0.5) * 100;
+            gPos.x = ghostSpawnX + (Math.random() - 0.5) * 100;
+            gPos.y = ghostSpawnY + (Math.random() - 0.5) * 60;
             attempts++;
         }
         
@@ -796,7 +812,8 @@ function generateDotsAndStars() {
                     y: y, 
                     active: true,
                     phase: Math.random() * Math.PI * 2,
-                    freq: 0.05 + Math.random() * 0.05
+                    freq: 0.05 + Math.random() * 0.05,
+                    size: 8
                 });
             }
         }
@@ -833,7 +850,7 @@ function generateDotsAndStars() {
 }
 
 function update() {
-    if(!gameRunning || isPaused) return;
+    if(!gameRunning || isPaused || player.isDead) return;
 
     animationFrame++;
     
@@ -868,56 +885,58 @@ function update() {
     const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
     let gSpeed = config.g_speed;
 
-    ghosts.forEach(g => {
-        let tx = player.x - g.x;
-        let ty = player.y - g.y;
-        let dist = Math.hypot(tx, ty);
-        let targetAngle = Math.atan2(ty, tx);
+    if (!player.isDead) {
+        ghosts.forEach(g => {
+            let tx = player.x - g.x;
+            let ty = player.y - g.y;
+            let dist = Math.hypot(tx, ty);
+            let targetAngle = Math.atan2(ty, tx);
 
-        g.angle = targetAngle;
+            g.angle = targetAngle;
 
-        let nextX = g.x + Math.cos(g.angle) * gSpeed;
-        let nextY = g.y + Math.sin(g.angle) * gSpeed;
-        
-        if (checkCollision(nextX, nextY, HITBOX_SIZE)) {
-            let found = false;
-            for (let offset = 0.5; offset < Math.PI * 2; offset += 0.5) {
-                let testAngle1 = g.angle + offset;
-                let testAngle2 = g.angle - offset;
-                
-                nextX = g.x + Math.cos(testAngle1) * gSpeed;
-                nextY = g.y + Math.sin(testAngle1) * gSpeed;
-                if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
-                    g.angle = testAngle1;
-                    found = true;
-                    break;
+            let nextX = g.x + Math.cos(g.angle) * gSpeed;
+            let nextY = g.y + Math.sin(g.angle) * gSpeed;
+            
+            if (checkCollision(nextX, nextY, HITBOX_SIZE)) {
+                let found = false;
+                for (let offset = 0.5; offset < Math.PI * 2; offset += 0.5) {
+                    let testAngle1 = g.angle + offset;
+                    let testAngle2 = g.angle - offset;
+                    
+                    nextX = g.x + Math.cos(testAngle1) * gSpeed;
+                    nextY = g.y + Math.sin(testAngle1) * gSpeed;
+                    if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
+                        g.angle = testAngle1;
+                        found = true;
+                        break;
+                    }
+                    
+                    nextX = g.x + Math.cos(testAngle2) * gSpeed;
+                    nextY = g.y + Math.sin(testAngle2) * gSpeed;
+                    if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
+                        g.angle = testAngle2;
+                        found = true;
+                        break;
+                    }
                 }
-                
-                nextX = g.x + Math.cos(testAngle2) * gSpeed;
-                nextY = g.y + Math.sin(testAngle2) * gSpeed;
-                if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
-                    g.angle = testAngle2;
-                    found = true;
-                    break;
+                if (!found) {
+                    g.angle += 0.1;
+                    return;
                 }
             }
-            if (!found) {
-                g.angle += 0.1;
-                return;
+
+            moveWithPhysics(g, Math.cos(g.angle) * gSpeed, Math.sin(g.angle) * gSpeed, HITBOX_SIZE);
+
+            if (dist < HITBOX_SIZE + GHOST_SIZE && player.invulnerable <= 0) {
+                playerHit();
             }
-        }
-
-        moveWithPhysics(g, Math.cos(g.angle) * gSpeed, Math.sin(g.angle) * gSpeed, HITBOX_SIZE);
-
-        if (dist < HITBOX_SIZE + GHOST_SIZE && player.invulnerable <= 0) {
-            playerHit();
-        }
-    });
+        });
+    }
 
     if (player.invulnerable > 0) player.invulnerable--;
 
     dots.forEach(d => {
-        if (d.active && Math.hypot(player.x - d.x, player.y - d.y) < HITBOX_SIZE + 5) {
+        if (d.active && Math.hypot(player.x - d.x, player.y - d.y) < HITBOX_SIZE + 12) {
             d.active = false;
             collectedDots++;
             playSound('dot');
@@ -926,7 +945,7 @@ function update() {
     });
 
     bigStars.forEach(s => {
-        if (s.active && Math.hypot(player.x - s.x, player.y - s.y) < HITBOX_SIZE + 10) {
+        if (s.active && Math.hypot(player.x - s.x, player.y - s.y) < HITBOX_SIZE + 20) {
             s.active = false;
             playSound('bigStar');
             let text = getText(s.textKey);
@@ -1038,78 +1057,82 @@ function draw() {
         }
     });
 
-    const playerDir = getDirectionFromAngle(player.angle);
-    let playerFrame = 0;
-    
-    if (isMoving) {
-        const currentTime = Date.now();
-        playerFrame = Math.floor(currentTime / ANIMATION_SPEED) % 2;
-    } else {
-        playerFrame = 0;
-    }
-    
-    let playerImgToDraw = null;
-    if (playerImgs[playerDir] && playerImgs[playerDir][playerFrame]) {
-        playerImgToDraw = playerImgs[playerDir][playerFrame];
-    }
-    
-    if (playerImgToDraw && playerImgToDraw.complete && playerImgToDraw.src && playerImgToDraw.loaded !== false) {
-        try {
-            if (Math.floor(player.invulnerable / 5) % 2 === 0) {
-                CTX.drawImage(playerImgToDraw, 
-                    player.x - PLAYER_SIZE, 
-                    player.y - PLAYER_SIZE, 
-                    PLAYER_SIZE * 2, 
-                    PLAYER_SIZE * 2
-                );
+    if (!player.isDead) {
+        const playerDir = getDirectionFromAngle(player.angle);
+        let playerFrame = 0;
+        
+        if (isMoving) {
+            const currentTime = Date.now();
+            playerFrame = Math.floor(currentTime / ANIMATION_SPEED) % 2;
+        } else {
+            playerFrame = 0;
+        }
+        
+        let playerImgToDraw = null;
+        if (playerImgs[playerDir] && playerImgs[playerDir][playerFrame]) {
+            playerImgToDraw = playerImgs[playerDir][playerFrame];
+        }
+        
+        if (playerImgToDraw && playerImgToDraw.complete && playerImgToDraw.src && playerImgToDraw.loaded !== false) {
+            try {
+                if (Math.floor(player.invulnerable / 5) % 2 === 0) {
+                    CTX.drawImage(playerImgToDraw, 
+                        player.x - PLAYER_SIZE, 
+                        player.y - PLAYER_SIZE, 
+                        PLAYER_SIZE * 2, 
+                        PLAYER_SIZE * 2
+                    );
+                }
+            } catch(e) {
+                if (!window.playerDrawErrorLogged) {
+                    console.log('玩家图片绘制失败，使用备用色块');
+                    window.playerDrawErrorLogged = true;
+                }
+                if (Math.floor(player.invulnerable / 5) % 2 === 0) {
+                    CTX.fillStyle = "#0ff";
+                    CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
+                }
             }
-        } catch(e) {
-            if (!window.playerDrawErrorLogged) {
-                console.log('玩家图片绘制失败，使用备用色块');
-                window.playerDrawErrorLogged = true;
-            }
+        } else {
             if (Math.floor(player.invulnerable / 5) % 2 === 0) {
                 CTX.fillStyle = "#0ff";
                 CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
             }
         }
-    } else {
-        if (Math.floor(player.invulnerable / 5) % 2 === 0) {
-            CTX.fillStyle = "#0ff";
-            CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
-        }
     }
 
-    ghosts.forEach((g, index) => {
-        const ghostDir = getDirectionFromAngle(g.angle);
-        let ghostFrame = Math.floor((animationFrame + index * 10) / ANIMATION_SPEED) % 2;
-        
-        let ghostImgToDraw = null;
-        if (ghostImgs[ghostDir] && ghostImgs[ghostDir][ghostFrame]) {
-            ghostImgToDraw = ghostImgs[ghostDir][ghostFrame];
-        }
-        
-        CTX.save();
-        CTX.translate(g.x, g.y);
-        CTX.shadowBlur = 25;
-        CTX.shadowColor = "#ff0000";
-        
-        if (ghostImgToDraw && ghostImgToDraw.complete && ghostImgToDraw.src && ghostImgToDraw.loaded !== false) {
-            try {
-                CTX.drawImage(ghostImgToDraw, -GHOST_SIZE, -GHOST_SIZE, GHOST_SIZE * 2, GHOST_SIZE * 2);
-            } catch(e) {
-                if (!window.ghostDrawErrorLogged) {
-                    console.log('鬼魂图片绘制失败，使用备用图形');
-                    window.ghostDrawErrorLogged = true;
+    if (!player.isDead) {
+        ghosts.forEach((g, index) => {
+            const ghostDir = getDirectionFromAngle(g.angle);
+            let ghostFrame = Math.floor((animationFrame + index * 10) / ANIMATION_SPEED) % 2;
+            
+            let ghostImgToDraw = null;
+            if (ghostImgs[ghostDir] && ghostImgs[ghostDir][ghostFrame]) {
+                ghostImgToDraw = ghostImgs[ghostDir][ghostFrame];
+            }
+            
+            CTX.save();
+            CTX.translate(g.x, g.y);
+            CTX.shadowBlur = 25;
+            CTX.shadowColor = "#ff0000";
+            
+            if (ghostImgToDraw && ghostImgToDraw.complete && ghostImgToDraw.src && ghostImgToDraw.loaded !== false) {
+                try {
+                    CTX.drawImage(ghostImgToDraw, -GHOST_SIZE, -GHOST_SIZE, GHOST_SIZE * 2, GHOST_SIZE * 2);
+                } catch(e) {
+                    if (!window.ghostDrawErrorLogged) {
+                        console.log('鬼魂图片绘制失败，使用备用图形');
+                        window.ghostDrawErrorLogged = true;
+                    }
+                    drawGhostFallback();
                 }
+            } else {
                 drawGhostFallback();
             }
-        } else {
-            drawGhostFallback();
-        }
-        
-        CTX.restore();
-    });
+            
+            CTX.restore();
+        });
+    }
 }
 
 function drawFallbackBackground() {
@@ -1214,30 +1237,60 @@ function findSafeSpot(sx, sy, size) {
     return {x: sx, y: sy};
 }
 
+// ==================== ⚡ 玩家碰撞处理：防重复触发，防音效堆叠 ====================
 function playerHit() {
+    // ==================== 🔧 核心防护：如果已经死亡，直接返回，不再执行任何操作 ====================
+    if (player.isDead) {
+        console.log('⚠️ 玩家已死亡，playerHit 被阻止重复触发');
+        return;
+    }
+    
+    // ==================== 🔧 设置死亡标记，阻止后续碰撞检测 ====================
+    player.isDead = true;
+    gameRunning = false;
     lives--;
-    playSound('collision');
+    
+    // ==================== 🎵 只播放一次碰撞音效 ====================
+    if (!SFX.collision.playing) {
+        playSound('collision');
+        SFX.collision.playing = true; // 防止重复播放标记
+    }
+    
     updateHUD();
     
     if (lives <= 0) {
-        if (bgMusicElement && musicPlaying) {
-            bgMusicElement.pause();
-        }
-        playSound('gameOver');
-        showResult(getText('game_over'), getText('btn_retry'), () => location.reload());
+        setTimeout(() => {
+            if (bgMusicElement && musicPlaying) {
+                bgMusicElement.pause();
+            }
+            // ==================== 🎵 游戏结束音效也只播放一次 ====================
+            if (!SFX.gameOver.playing) {
+                playSound('gameOver');
+                SFX.gameOver.playing = true;
+            }
+            showResult(getText('game_over'), getText('btn_retry'), () => location.reload());
+        }, 800);
     } else {
         player.invulnerable = 120;
-        let safe = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
-        player.x = safe.x;
-        player.y = safe.y;
-        
-        ghosts.forEach((g, index) => {
-            let ghostSafe = findSafeSpot(CANVAS.width - 200, 200 + index*150, HITBOX_SIZE);
-            g.x = ghostSafe.x;
-            g.y = ghostSafe.y;
-        });
-        
-        alert(getText('hit_warning'));
+        setTimeout(() => {
+            // ==================== 🔧 重置标记，准备复活 ====================
+            SFX.collision.playing = false;
+            
+            let safe = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
+            player.x = safe.x;
+            player.y = safe.y;
+            
+            ghosts.forEach((g, index) => {
+                let ghostSafe = findSafeSpot(CANVAS.width - 200, 200 + index*150, HITBOX_SIZE);
+                g.x = ghostSafe.x;
+                g.y = ghostSafe.y;
+            });
+            
+            alert(getText('hit_warning'));
+            player.isDead = false; // 重置死亡状态
+            gameRunning = true;
+            isPaused = false;
+        }, 800);
     }
 }
 
@@ -1323,39 +1376,32 @@ function showResult(title, btnText, callback) {
     }
 }
 
-// ==================== 🎬 显示多语言电影谢幕 ====================
 function showEndingScreen() {
-    // 隐藏游戏画布
     const container = document.getElementById('canvas-container');
     if (container) container.style.display = 'none';
     
-    // 隐藏音乐按钮
     const musicBtn = document.getElementById('music-btn');
     if (musicBtn) musicBtn.style.display = 'none';
     
-    // 获取当前语言的谢幕文本并填充
     const creditsContent = document.getElementById('credits-content');
     if (creditsContent) {
         creditsContent.innerHTML = getText('ending_credits');
     }
     
-    // 显示谢幕画面
     const endingScreen = document.getElementById('ending-screen');
     if (endingScreen) {
         endingScreen.classList.remove('hidden');
     }
     
-    // 播放胜利音乐
+    // ==================== 🎵 胜利音效只播放一次 ====================
     playSound('gameWin');
     
-    // 35秒后自动询问是否重新开始
     setTimeout(() => {
         if (confirm(getText('btn_retry') + '?')) {
             location.reload();
         }
-    }, 35000);
+    }, 45000);
 }
-// ==================== 多语言谢幕功能结束 ====================
 
 function updateHUD() {
     const livesEl = document.getElementById('lives');
