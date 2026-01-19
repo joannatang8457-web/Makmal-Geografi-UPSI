@@ -507,11 +507,11 @@ const CTX = CANVAS.getContext('2d');
 const MASK_CANVAS = document.createElement('canvas');
 const MASK_CTX = MASK_CANVAS.getContext('2d', { willReadFrequently: true });
 
-// ==================== ⚡ 关卡速度配置：每关递增，越来越刺激 ====================
+// ==================== ⚡ 调整速度：第一关稍微调慢，保持关卡递增节奏 ====================
 const LEVEL_CONFIG = {
-    1: { p_speed: 2.5, g_speed: 1.3 },  // 第一关：升级！鬼速度从1.0→1.3，更有挑战性
-    2: { p_speed: 2.8, g_speed: 1.3 },
-    3: { p_speed: 3.2, g_speed: 1.6 }   // 第三关：最高速度，最具挑战性
+    1: { p_speed: 2.5, g_speed: 1.1 },  // 第一关：鬼速度从1.3降到1.1，更适中
+    2: { p_speed: 2.8, g_speed: 1.4 },  // 第二关：相应调整
+    3: { p_speed: 3.2, g_speed: 1.7 }   // 第三关：最高难度
 };
 
 const PLAYER_SIZE = 24;
@@ -755,14 +755,12 @@ function setupGameWorld() {
 
     ghosts = [];
     // ==================== ⚡ 难度升级：第一关有2个鬼，第二关3个，第三关4个 ====================
-    // 原来：let ghostCount = currentLevel;
     let ghostCount = currentLevel + 1;
     
     for(let i = 0; i < ghostCount; i++) {
         // ==================== ⚡ 位置调整：鬼魂更靠近中心"隘口" ====================
-        // 原来：let ghostSpawnX = CANVAS.width - 200;
-        let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120; // 更靠近中心区域
-        let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80; // 在必经之路上形成交叉巡逻
+        let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120;
+        let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80;
         
         let gPos = findSafeSpot(ghostSpawnX, ghostSpawnY, HITBOX_SIZE);
         
