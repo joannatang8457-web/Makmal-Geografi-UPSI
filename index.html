@@ -1,526 +1,503 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Starry Echoes: The Geographer's Maze</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <style>
-        /* ==================== 🎨 强制艺术字体设置 ==================== */
-        body { 
-            margin: 0; 
-            background: #000; 
-            overflow: hidden; 
-            font-family: 'Crimson Text', serif; 
-            touch-action: none; 
-            user-select: none; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        
-        #canvas-container {
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
-            background: #000;
-        }
-        
-        canvas { 
-            display: block;
-            width: 100%;
-            height: 100%;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Starry Echoes: The Geographer's Maze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ==================== 🎨 强制艺术字体设置 ==================== */
+body {
+margin: 0;
+background: #000;
+overflow: hidden;
+font-family: 'Crimson Text', serif;
+touch-action: none;
+user-select: none;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
 
-        #ui-layer { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            pointer-events: none; 
-        }
-        .hud { 
-            position: absolute; 
-            color: #fff; 
-            text-shadow: 2px 2px 0 #000; 
-            font-weight: bold; 
-            pointer-events: none; 
-            font-size: 24px;
-        }
-        #lives { 
-            top: 20px; 
-            left: 20px; 
-        }
-        #score-board { 
-            top: 20px; 
-            right: 20px; 
-            text-align: right; 
-        }
-        
-        #joystick-zone { 
-            position: fixed; 
-            bottom: 10px; 
-            left: 10px;   
-            width: 100px; 
-            height: 100px; 
-            pointer-events: auto; 
-            z-index: 1000; 
-        }
-        #joystick-knob { 
-            position: absolute; 
-            width: 35px; 
-            height: 35px; 
-            background: rgba(255,255,255,0.5); 
-            border-radius: 50%; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            box-shadow: 0 0 10px #fff; 
-            pointer-events: none; 
-        }
-        #joystick-base { 
-            width: 100%; 
-            height: 100%; 
-            border: 2px solid rgba(255,255,255,0.3); 
-            border-radius: 50%; 
-            background: rgba(0,0,0,0.2); 
-        }
+#canvas-container {
+position: relative;
+max-width: 100%;
+max-height: 100%;
+background: #000;
+}
 
-        .modal { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.95); 
-            z-index: 100; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            color: #fff; 
-            text-align: center; 
-            padding: 20px; 
-            box-sizing: border-box;
-        }
-        .hidden { 
-            display: none !important; 
-        }
-        
-        #start-screen {
-            background-image: url('bg_start.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            justify-content: flex-start !important;
-            padding: 80px 20px 60px 20px !important;
-        }
-        
-        #start-screen .subtitle {
-            font-size: 36px !important;
-            color: #aaa;
-            font-style: italic;
-            margin-top: -60px !important;
-            margin-bottom: 10px !important;
-        }
-        
-        #start-screen h1 {
-            font-size: 64px !important;
-            font-family: 'Dancing Script', cursive !important;
-            color: #f9d71c;
-            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
-            margin-bottom: 15px;
-        }
-        
-        p { 
-            font-size: 18px; 
-            line-height: 1.6; 
-            max-width: 600px; 
-            margin: 0 auto 20px auto; 
-        }
-        
-        .btn { 
-            font-family: 'Crimson Text', serif !important;
-            font-weight: bold !important;
-            background: rgba(30, 58, 138, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(100, 150, 255, 0.5);
-            color: #FFFFFF;
-            padding: 15px 40px; 
-            font-size: 20px; 
-            cursor: pointer; 
-            margin: 10px; 
-            border-radius: 10px; 
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(100, 150, 255, 0.6);
-            border-color: rgba(100, 150, 255, 0.8);
-            background: rgba(30, 58, 138, 0.95);
-        }
-        .btn:active { 
-            transform: scale(0.95); 
-        }
+canvas {
+display: block;
+width: 100%;
+height: 100%;
+image-rendering: pixelated;
+image-rendering: -moz-crisp-edges;
+image-rendering: crisp-edges;
+}
+#ui-layer {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+}
+.hud {
+position: absolute;
+color: #fff;
+text-shadow: 2px 2px 0 #000;
+font-weight: bold;
+pointer-events: none;
+font-size: 24px;
+}
+#lives {
+top: 20px;
+left: 20px;
+}
+#score-board {
+top: 20px;
+right: 20px;
+text-align: right;
+}
 
-        #story-box { 
-            background: rgba(0, 20, 40, 0.9); 
-            border: 4px solid #f9d71c; 
-            border-radius: 15px; 
-            padding: 30px; 
-            max-width: 80%;
-        }
-        #story-title { 
-            color: #f9d71c; 
-            font-size: 24px; 
-            margin-bottom: 15px; 
-        }
-        #story-content { 
-            font-size: 18px; 
-            text-align: left; 
-            min-height: 100px; 
-        }
+#joystick-zone {
+position: fixed;
+bottom: 10px;
+left: 10px;
+width: 100px;
+height: 100px;
+pointer-events: auto;
+z-index: 1000;
+}
+#joystick-knob {
+position: absolute;
+width: 35px;
+height: 35px;
+background: rgba(255,255,255,0.5);
+border-radius: 50%;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+box-shadow: 0 0 10px #fff;
+pointer-events: none;
+}
+#joystick-base {
+width: 100%;
+height: 100%;
+border: 2px solid rgba(255,255,255,0.3);
+border-radius: 50%;
+background: rgba(0,0,0,0.2);
+}
+.modal {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 100;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+color: #fff;
+text-align: center;
+padding: 20px;
+box-sizing: border-box;
+}
+.hidden {
+display: none !important;
+}
 
-        #music-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid #f9d71c;
-            color: #f9d71c;
-            padding: 10px 15px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 200;
-            font-size: 24px;
-            pointer-events: auto;
-        }
-        
-        #story-bg-img {
-            width: 90%;
-            max-width: 800px;
-            height: 60vh;
-            object-fit: contain;
-            margin: 20px auto;
-            border: 3px solid #f9d71c;
-            border-radius: 10px;
-        }
-        
-        #level-story-content {
-            font-size: 20px;
-            line-height: 1.8;
-            margin-top: 20px;
-            max-width: 90%;
-            max-height: 30vh;
-            overflow-y: auto;
-        }
+#start-screen {
+background-image: url('bg_start.jpg');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+justify-content: flex-start !important;
+padding: 80px 20px 60px 20px !important;
+}
 
-        /* ==================== 🎬 多语言电影谢幕 ==================== */
-        #ending-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('ending_bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: rgba(0, 0, 0, 0.7);
-            background-blend-mode: darken;
-            z-index: 150;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            text-align: center;
-            overflow: hidden;
-        }
+#start-screen .subtitle {
+font-size: 36px !important;
+color: #aaa;
+font-style: italic;
+margin-top: -60px !important;
+margin-bottom: 10px !important;
+}
 
-        .credits-text {
-            transform: translateY(100%);
-            /* ==================== ⏱️ 放慢到40秒，更优雅 ==================== */
-            animation: scrollUp 40s linear forwards;
-            font-family: 'Crimson Text', serif;
-            font-size: 24px;
-            line-height: 1.8;
-            max-width: 80%;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-        }
+#start-screen h1 {
+font-size: 64px !important;
+font-family: 'Dancing Script', cursive !important;
+color: #f9d71c;
+text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
+margin-bottom: 15px;
+}
 
-        @keyframes scrollUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(-150%);
-            }
-        }
-    </style>
+p {
+font-size: 18px;
+line-height: 1.6;
+max-width: 600px;
+margin: 0 auto 20px auto;
+}
+
+.btn {
+font-family: 'Crimson Text', serif !important;
+font-weight: bold !important;
+background: rgba(30, 58, 138, 0.85);
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+border: 1px solid rgba(100, 150, 255, 0.5);
+color: #FFFFFF;
+padding: 15px 40px;
+font-size: 20px;
+cursor: pointer;
+margin: 10px;
+border-radius: 10px;
+transition: all 0.3s ease;
+}
+.btn:hover {
+transform: scale(1.05);
+box-shadow: 0 0 25px rgba(100, 150, 255, 0.6);
+border-color: rgba(100, 150, 255, 0.8);
+background: rgba(30, 58, 138, 0.95);
+}
+.btn:active {
+transform: scale(0.95);
+}
+#story-box {
+background: rgba(0, 20, 40, 0.9);
+border: 4px solid #f9d71c;
+border-radius: 15px;
+padding: 30px;
+max-width: 80%;
+}
+#story-title {
+color: #f9d71c;
+font-size: 24px;
+margin-bottom: 15px;
+}
+#story-content {
+font-size: 18px;
+text-align: left;
+min-height: 100px;
+}
+#music-btn {
+position: absolute;
+bottom: 20px;
+right: 20px;
+background: rgba(255,255,255,0.2);
+border: 2px solid #f9d71c;
+color: #f9d71c;
+padding: 10px 15px;
+border-radius: 50%;
+cursor: pointer;
+z-index: 200;
+font-size: 24px;
+pointer-events: auto;
+}
+
+#story-bg-img {
+width: 90%;
+max-width: 800px;
+height: 60vh;
+object-fit: contain;
+margin: 20px auto;
+border: 3px solid #f9d71c;
+border-radius: 10px;
+}
+
+#level-story-content {
+font-size: 20px;
+line-height: 1.8;
+margin-top: 20px;
+max-width: 90%;
+max-height: 30vh;
+overflow-y: auto;
+}
+/* ==================== 🎬 多语言电影谢幕 ==================== */
+#ending-screen {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image: url('ending_bg.jpg');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-color: rgba(0, 0, 0, 0.7);
+background-blend-mode: darken;
+z-index: 150;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+color: #fff;
+text-align: center;
+overflow: hidden;
+}
+.credits-text {
+transform: translateY(100%);
+/* ==================== ⏱️ 放慢到40秒，更优雅 ==================== */
+animation: scrollUp 40s linear forwards;
+font-family: 'Crimson Text', serif;
+font-size: 24px;
+line-height: 1.8;
+max-width: 80%;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+@keyframes scrollUp {
+from {
+transform: translateY(100%);
+}
+to {
+transform: translateY(-150%);
+}
+}
+</style>
 </head>
 <body>
+<div id="joystick-zone" class="hidden">
+<div id="joystick-base"></div>
+<div id="joystick-knob"></div>
+</div>
+<div id="canvas-container">
+<canvas id="gameCanvas"></canvas>
 
-    <div id="joystick-zone" class="hidden">
-        <div id="joystick-base"></div>
-        <div id="joystick-knob"></div>
-    </div>
+<div id="ui-layer">
+<div id="lives" class="hud">❤️❤️❤️</div>
+<div id="score-board" class="hud">
+LV <span id="level-num">1</span><br>
+<span id="collect-text">0%</span>
+</div>
+</div>
+</div>
+<audio id="bgMusic" loop>
+<source src="bgm.mp3" type="audio/mpeg">
+Your browser does not support HTML audio.
+</audio>
 
-    <div id="canvas-container">
-        <canvas id="gameCanvas"></canvas>
-        
-        <div id="ui-layer">
-            <div id="lives" class="hud">❤️❤️❤️</div>
-            <div id="score-board" class="hud">
-                LV <span id="level-num">1</span><br>
-                <span id="collect-text">0%</span>
-            </div>
-        </div>
-    </div>
-
-    <audio id="bgMusic" loop>
-        <source src="bgm.mp3" type="audio/mpeg">
-        Your browser does not support HTML audio.
-    </audio>
-    
-    <div id="music-btn" class="hidden" onclick="toggleMusic()">🎵</div>
-
-    <!-- ==================== 🎬 多语言电影谢幕容器 ==================== -->
-    <div id="ending-screen" class="hidden">
-        <div class="credits-text" id="credits-content">
-            <!-- 内容将由JavaScript动态填充 -->
-        </div>
-    </div>
-
-    <div id="start-screen" class="modal hidden">
-        <h2 class="subtitle">The Geographer's Maze</h2>
-        <h1>Starry Echoes</h1>
-        <div style="margin-top: 40px;">
-            <button class="btn lang-btn" onclick="selectLang('CN')">中文</button>
-            <button class="btn lang-btn" onclick="selectLang('BM')">Melayu</button>
-            <button class="btn lang-btn" onclick="selectLang('EN')">English</button>
-        </div>
-    </div>
-
-    <div id="story-modal" class="modal hidden">
-        <div id="story-box">
-            <div id="story-title">HISTORY FOUND</div>
-            <div id="story-content">...</div>
-            <button class="btn" onclick="closeStory()">▼</button>
-        </div>
-    </div>
-
-    <div id="result-modal" class="modal hidden">
-        <h1 id="result-title">LEVEL CLEARED</h1>
-        <p id="result-desc">Proceed to the next room.</p>
-        <button id="next-btn" class="btn" onclick="nextLevel()">CONTINUE</button>
-    </div>
-
-    <div id="level-story-modal" class="modal hidden">
-        <div id="story-box">
-            <img id="story-bg-img" src="" alt="Story Background">
-            <div id="level-story-content"></div>
-            <button class="btn" onclick="closeLevelStory()"><span id="story-btn-text">继续</span></button>
-        </div>
-    </div>
-
+<div id="music-btn" class="hidden" onclick="toggleMusic()">🎵</div>
+<div id="ending-screen" class="hidden">
+<div class="credits-text" id="credits-content">
+</div>
+</div>
+<div id="start-screen" class="modal hidden">
+<h2 class="subtitle">The Geographer's Maze</h2>
+<h1>Starry Echoes</h1>
+<div style="margin-top: 40px;">
+<button class="btn lang-btn" onclick="selectLang('CN')">中文</button>
+<button class="btn lang-btn" onclick="selectLang('BM')">Melayu</button>
+<button class="btn lang-btn" onclick="selectLang('EN')">English</button>
+</div>
+</div>
+<div id="story-modal" class="modal hidden">
+<div id="story-box">
+<div id="story-title">HISTORY FOUND</div>
+<div id="story-content">...</div>
+<button class="btn" onclick="closeStory()">▼</button>
+</div>
+</div>
+<div id="result-modal" class="modal hidden">
+<h1 id="result-title">LEVEL CLEARED</h1>
+<p id="result-desc">Proceed to the next room.</p>
+<button id="next-btn" class="btn" onclick="nextLevel()">CONTINUE</button>
+</div>
+<div id="level-story-modal" class="modal hidden">
+<div id="story-box">
+<img id="story-bg-img" src="" alt="Story Background">
+<div id="level-story-content"></div>
+<button class="btn" onclick="closeLevelStory()"><span id="story-btn-text">继续</span></button>
+</div>
+</div>
 <script>
 const TEXT_DATA = {
-    CN: {
-        l1_intro: "你出于好奇推开了地理室的门...这里变得不一样了。那是梵高的星空吗？",
-        l1_star1: "【2005年的回响】\n这栋建筑落成于2005年。你看那陡峭的屋顶(Bumbung Curam)和标志性的通风孔，那是为了适应热带气候而保留的殖民地美学。",
-        l2_intro: "房间变得更破旧了...地上堆满了旧时代的教具。",
-        l2_star1: "【1922年的遗产】\n这里继承了 SITC 时代的灵魂。地理曾是这里最早的核心科目(Subjek Teras)，教导马来教师们理解脚下的土地与世界。",
-        l3_intro: "空间开始扭曲！墙上的浮雕仿佛活了过来！快逃出去！",
-        l3_star1: "【探索的演变】\n墙上的浮雕(Arca Timbul)诉说着人类的探索史。从古老的手工制图到现代 GIS 系统，我们对世界的认知从未停止。",
-        level1_complete: "【第一章：苏醒】\n你收集了这个区域的所有记忆碎片。建筑在回应你，墙壁上的星空开始流动，仿佛有什么要苏醒过来。\n\n" +
-                         "这座地理实验室是人文学院下的卓越中心，于2005年落成，延续了自1922年SITC时代开始的地理学传承。地理学在丹绒马林有着非常重要的历史意义，因为它是最早教授给马来教师的核心科目之一，让他们理解地图绘制、自然资源和国家地缘政治。",
-        level2_complete: "【第二章：追忆】\n随着更多记忆被修复，建筑的过去逐渐清晰。1922年的灵魂与2005年的新生命在此交织。\n\n" +
-                         "从设计角度来看，这座建筑保留了殖民美学，通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，同时在外墙加强了独特的浮雕(Arca Timbul)，展示世界地图作为人类探索历史的象征。这种整合象征着知识从传统手工制图方法向现代地理信息系统（GIS）技术的转变。",
-        level3_complete: "【终章：传承】\n所有的记忆都已收集完成。这座建筑的情绪被彻底抚平，地理学的传承将永远延续。\n\n" +
-                         "这座建筑的存在唤起了对知识连续性的敬畏，这种连续性提升国家地理教育已超过一个世纪。它傲然矗立，象征着将前辈教育工作者的奋斗怀旧与今天学生的学术抱负团结在一起的骄傲。对这种历史遗产的热爱增强了我们继续保护地球可持续性并提升地理学知识的决心，为了未来的一代。",
-        next_btn: "继续",
-        game_over: "意识迷失",
-        btn_retry: "重新尝试",
-        hit_warning: "OUCH! 小心那些黑影...",
-        ending_credits: `
-            <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
-            <p>【终章：传承】</p>
-            <p>所有的记忆都已收集完成。</p>
-            <p>这座建筑的情绪被彻底抚平，地理学的传承将永远延续。</p>
-            <br><br>
-            <p>这座地理实验室是人文学院下的卓越中心，</p>
-            <p>于2005年落成，延续了自1922年SITC时代开始的地理学传承。</p>
-            <br><br>
-            <p>地理学在丹绒马林有着非常重要的历史意义，</p>
-            <p>因为它是最早教授给马来教师的核心科目之一，</p>
-            <p>让他们理解地图绘制、自然资源和国家地缘政治。</p>
-            <br><br>
-            <p>从设计角度来看，这座建筑保留了殖民美学，</p>
-            <p>通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，</p>
-            <p>同时在外墙加强了独特的浮雕(Arca Timbul)，</p>
-            <p>展示世界地图作为人类探索历史的象征。</p>
-            <br><br>
-            <p>这种整合象征着知识从传统手工制图方法</p>
-            <p>向现代地理信息系统（GIS）技术的转变。</p>
-            <br><br>
-            <p>这座建筑的存在唤起了对知识连续性的敬畏，</p>
-            <p>这种连续性提升国家地理教育已超过一个世纪。</p>
-            <br><br>
-            <p>它傲然矗立，象征着将前辈教育工作者的奋斗怀旧</p>
-            <p>与今天学生的学术抱负团结在一起的骄傲。</p>
-            <br><br>
-            <p>对这种历史遗产的热爱增强了我们继续保护地球可持续性</p>
-            <p>并提升地理学知识的决心，为了未来的一代。</p>
-            <br><br><br><br>
-            <p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">The End</p>
-            <p style="font-size: 18px; margin-top: 20px;">Thank you for playing</p>
-        `
-    },
-    BM: {
-        l1_intro: "Perasaan ingin tahu membawa anda ke sini... Adakah ini lukisan Van Gogh?",
-        l1_star1: "【Gema 2005】\nBangunan ini dirasmikan pada 2005. Lihat bumbung curam dan lubang pengudaraan itu, ia mengekalkan estetika kolonial untuk iklim tropika.",
-        l2_intro: "Bilik ini kelihatan usang... Penuh dengan peralatan lama.",
-        l2_star1: "【Warisan 1922】\nDi sini terletaknya jiwa SITC. Geografi adalah antara subjek teras terawal, mengajar guru Melayu memahami tanah air dan dunia.",
-        l3_intro: "Ruang semakin herot! Arca di dinding seakan hidup! Lari!",
-        l3_star1: "【Evolusi Eksplorasi】\nArca timbul ini menceritakan sejarah eksplorasi. Dari peta manual ke sistem GIS moden, ilmu geografi terus berkembang.",
-        level1_complete: "【Bab 1: Kebangkitan】\nAnda mengumpulkan semua serpihan memori di kawasan ini. Bangunan itu menjawab, bintang di dinding mula mengalir, seolah-olah sesuatu akan bangkit.\n\n" +
-                         "Makmal Geografi ini merupakan pusat kecemerlangan di bawah Fakulti Sains Kemanusiaan yang dirasmikan pada tahun 2005 bagi meneruskan legasi pengajian Geografi yang telah bermula sejak era Sultan Idris Training College (SITC) pada tahun 1922.\n\n" +
-                         "Disiplin Geografi mempunyai sejarah yang sangat signifikan di Tanjong Malim kerana ia merupakan antara subjek teras terawal yang diajar kepada guru-guru Melayu untuk memahami pemetaan, sumber alam, dan geopolitik negara.",
-        level2_complete: "【Bab 2: Kenangan】\nDengan lebih banyak memori dipulihkan, masa lalu bangunan menjadi lebih jelas. Jiwa tahun 1922 dan nyawa baru tahun 2005 bersatu di sini.\n\n" +
-                         "Dari aspek reka bentuk, bangunan ini mengekalkan estetika kolonial melalui struktur bumbung curam dan lubang pengudaraan ikonik, namun diperkasakan dengan arca timbul unik pada dinding luar yang memaparkan peta dunia sebagai simbol sejarah eksplorasi manusia.\n\n" +
-                         "Integrasi ini melambangkan transisi ilmu daripada kaedah pemetaan manual tradisional kepada teknologi Sistem Maklumat Geografi (GIS) yang serba moden.",
-        level3_complete: "【Bab Akhir: Warisan】\nSemua memori telah dikumpulkan sepenuhnya. Emosi bangunan telah tenang sepenuhnya, warisan Geografi akan berterusan selamanya.\n\n" +
-                         "Kehadiran bangunan ini membangkitkan rasa takzim terhadap kesinambungan intelektual yang telah memartabatkan pendidikan geografi tanah air selama lebih satu abad.\n\n" +
-                         "Ia berdiri teguh sebagai simbol kebanggaan yang menyatukan nostalgia perjuangan pendidik terdahulu dengan aspirasi akademik mahasiswa masa kini.\n\n" +
-                         "Perasaan cinta akan warisan sejarah ini memperkukuh azam kami untuk terus memelihara kelestarian bumi serta memartabatkan ilmu geografi demi masa depan generasi akan datang.",
-        next_btn: "Teruskan",
-        game_over: "TAMAT PERMAINAN",
-        btn_retry: "Cuba Lagi",
-        hit_warning: "AWAS! Hantu itu...",
-        ending_credits: `
-            <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
-            <p>【Bab Akhir: Warisan】</p>
-            <p>Semua memori telah dikumpulkan sepenuhnya.</p>
-            <p>Emosi bangunan telah tenang sepenuhnya, warisan Geografi akan berterusan selamanya.</p>
-            <br><br>
-            <p>Makmal Geografi ini merupakan pusat kecemerlangan</p>
-            <p>di bawah Fakulti Sains Kemanusiaan yang dirasmikan pada tahun 2005</p>
-            <p>bagi meneruskan legasi pengajian Geografi yang telah bermula</p>
-            <p>sejak era Sultan Idris Training College (SITC) pada tahun 1922.</p>
-            <br><br>
-            <p>Disiplin Geografi mempunyai sejarah yang sangat signifikan di Tanjong Malim</p>
-            <p>kerana ia merupakan antara subjek teras terawal yang diajar kepada guru-guru Melayu</p>
-            <p>untuk memahami pemetaan, sumber alam, dan geopolitik negara.</p>
-            <br><br>
-            <p>Dari aspek reka bentuk, bangunan ini mengekalkan estetika kolonial</p>
-            <p>melalui struktur bumbung curam dan lubang pengudaraan ikonik,</p>
-            <p>namun diperkasakan dengan arca timbul unik pada dinding luar</p>
-            <p>yang memaparkan peta dunia sebagai simbol sejarah eksplorasi manusia.</p>
-            <br><br>
-            <p>Integrasi ini melambangkan transisi ilmu daripada kaedah pemetaan manual tradisional</p>
-            <p>kepada teknologi Sistem Maklumat Geografi (GIS) yang serba moden.</p>
-            <br><br>
-            <p>Kehadiran bangunan ini membangkitkan rasa takzim terhadap kesinambungan intelektual</p>
-            <p>yang telah memartabatkan pendidikan geografi tanah air selama lebih satu abad.</p>
-            <br><br>
-            <p>Ia berdiri teguh sebagai simbol kebanggaan yang menyatukan</p>
-            <p>nostalgia perjuangan pendidik terdahulu dengan aspirasi akademik mahasiswa masa kini.</p>
-            <br><br>
-            <p>Perasaan cinta akan warisan sejarah ini memperkukuh azam kami</p>
-            <p>untuk terus memelihara kelestarian bumi serta memartabatkan ilmu geografi</p>
-            <p>demi masa depan generasi akan datang.</p>
-            <br><br><br><br>
-            <p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">Tamatt</p>
-            <p style="font-size: 18px; margin-top: 20px;">Terima kasih kerana bermain</p>
-        `
-    },
-    EN: {
-        l1_intro: "Curiosity led you inside... Is this a Van Gogh painting?",
-        l1_star1: "【Echoes of 2005】\nBuilt in 2005, this lab features steep roofs and iconic ventilation holes, preserving colonial aesthetics for the tropical climate.",
-        l2_intro: "The room feels older... cluttered with vintage equipment.",
-        l2_star1: "【Legacy of 1922】\nThis site inherits the soul of SITC. Geography was a core subject, teaching Malay teachers to understand their land and geopolitics.",
-        l3_intro: "Reality is twisting! The wall reliefs are moving! Run!",
-        l3_star1: "【Evolution of Exploration】\nThe wall reliefs (Arca Timbul) tell the story of exploration. From manual mapping to modern GIS, our quest for knowledge never ends.",
-        level1_complete: "【Chapter 1: Awakening】\nYou collected all memory fragments in this area. The building responds, stars on walls begin to flow as if something is awakening.\n\n" +
-                         "This Geography Laboratory is a center of excellence under the Faculty of Human Sciences inaugurated in 2005 to continue the legacy of Geography studies that began since the era of Sultan Idris Training College (SITC) in 1922.\n\n" +
-                         "The discipline of Geography has a very significant history in Tanjong Malim as it was one of the earliest core subjects taught to Malay teachers to understand mapping, natural resources, and national geopolitics.",
-        level2_complete: "【Chapter 2: Remembrance】\nWith more memories restored, the building's past becomes clearer. The soul of 1922 and new life of 2005 intertwine here.\n\n" +
-                         "In terms of design, this building preserves colonial aesthetics through its steep roof structure and iconic ventilation holes, yet is strengthened by unique bas-reliefs on the exterior walls displaying a world map as a symbol of human exploration history.\n\n" +
-                         "This integration symbolizes the transition of knowledge from traditional manual mapping methods to modern Geographic Information System (GIS) technology.",
-        level3_complete: "【Final Chapter: Legacy】\nAll memories have been collected. The building's emotions are completely soothed, the legacy of Geography will continue forever.\n\n" +
-                         "The presence of this building evokes reverence for the intellectual continuity that has elevated geography education in the homeland for over a century.\n\n" +
-                         "It stands proudly as a symbol of pride that unites the nostalgia of previous educators' struggles with the academic aspirations of today's students.\n\n" +
-                         "This love for historical heritage strengthens our resolve to continue preserving earth's sustainability and elevating geography knowledge for future generations.",
-        next_btn: "Continue",
-        game_over: "GAME OVER",
-        btn_retry: "Try Again",
-        hit_warning: "OUCH! Watch out for those shadows...",
-        ending_credits: `
-            <h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
-            <p>【Final Chapter: Legacy】</p>
-            <p>All memories have been collected.</p>
-            <p>The building's emotions are completely soothed, the legacy of Geography will continue forever.</p>
-            <br><br>
-            <p>This Geography Laboratory is a center of excellence under the Faculty of Human Sciences,</p>
-            <p>inaugurated in 2005 to continue the legacy of Geography studies that began</p>
-            <p>since the era of Sultan Idris Training College (SITC) in 1922.</p>
-            <br><br>
-            <p>The discipline of Geography has a very significant history in Tanjong Malim</p>
-            <p>as it was one of the earliest core subjects taught to Malay teachers</p>
-            <p>to understand mapping, natural resources, and national geopolitics.</p>
-            <br><br>
-            <p>In terms of design, this building preserves colonial aesthetics</p>
-            <p>through its steep roof structure and iconic ventilation holes,</p>
-            <p>yet is strengthened by unique bas-reliefs on the exterior walls</p>
-            <p>displaying a world map as a symbol of human exploration history.</p>
-            <br><br>
-            <p>This integration symbolizes the transition of knowledge</p>
-            <p>from traditional manual mapping methods to modern Geographic Information System (GIS) technology.</p>
-            <br><br>
-            <p>The presence of this building evokes reverence for the intellectual continuity</p>
-            <p>that has elevated geography education in the homeland for over a century.</p>
-            <br><br>
-            <p>It stands proudly as a symbol of pride that unites the nostalgia of previous educators' struggles</p>
-            <p>with the academic aspirations of today's students.</p>
-            <br><br>
-            <p>This love for historical heritage strengthens our resolve to continue preserving earth's sustainability</p>
-            <p>and elevating geography knowledge for future generations.</p>
-            <br><br><br><br>
-            <p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">The End</p>
-            <p style="font-size: 18px; margin-top: 20px;">Thank you for playing</p>
-        `
-    }
+CN: {
+l1_intro: "你出于好奇推开了地理室的门...这里变得不一样了。那是梵高的星空吗？",
+l1_star1: "【2005年的回响】\n这栋建筑落成于2005年。你看那陡峭的屋顶(Bumbung Curam)和标志性的通风孔，那是为了适应热带气候而保留的殖民地美学。",
+l2_intro: "房间变得更破旧了...地上堆满了旧时代的教具。",
+l2_star1: "【1922年的遗产】\n这里继承了 SITC 时代的灵魂。地理曾是这里最早的核心科目(Subjek Teras)，教导马来教师们理解脚下的土地与世界。",
+l3_intro: "空间开始扭曲！墙上的浮雕仿佛活了过来！快逃出去！",
+l3_star1: "【探索的演变】\n墙上的浮雕(Arca Timbul)诉说着人类的探索史。从古老的手工制图到现代 GIS 系统，我们对世界的认知从未停止。",
+level1_complete: "【第一章：苏醒】\n你收集了这个区域的所有记忆碎片。建筑在回应你，墙壁上的星空开始流动，仿佛有什么要苏醒过来。\n\n" +
+"这座地理实验室是人文学院下的卓越中心，于2005年落成，延续了自1922年SITC时代开始的地理学传承。地理学在丹绒马林有着非常重要的历史意义，因为它是最早教授给马来教师的核心科目之一，让他们理解地图绘制、自然资源和国家地缘政治。",
+level2_complete: "【第二章：追忆】\n随着更多记忆被修复，建筑的过去逐渐清晰。1922年的灵魂与2005年的新生命在此交织。\n\n" +
+"从设计角度来看，这座建筑保留了殖民美学，通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，同时在外墙加强了独特的浮雕(Arca Timbul)，展示世界地图作为人类探索历史的象征。这种整合象征着知识从传统手工制图方法向现代地理信息系统（GIS）技术的转变。",
+level3_complete: "【终章：传承】\n所有的记忆都已收集完成。这座建筑的情绪被彻底抚平，地理学的传承将永远延续。\n\n" +
+"这座建筑的存在唤起了对知识连续性的敬畏，这种连续性提升国家地理教育已超过一个世纪。它傲然矗立，象征着将前辈教育工作者的奋斗怀旧与今天学生的学术抱负团结在一起的骄傲。对这种历史遗产的热爱增强了我们继续保护地球可持续性并提升地理学知识的决心，为了未来的一代。",
+next_btn: "继续",
+game_over: "意识迷失",
+btn_retry: "重新尝试",
+hit_warning: "OUCH! 小心那些黑影...",
+ending_credits: `
+<h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
+<p>【终章：传承】</p>
+<p>所有的记忆都已收集完成。</p>
+<p>这座建筑的情绪被彻底抚平，地理学的传承将永远延续。</p>
+<br><br>
+<p>这座地理实验室是人文学院下的卓越中心，</p>
+<p>于2005年落成，延续了自1922年SITC时代开始的地理学传承。</p>
+<br><br>
+<p>地理学在丹绒马林有着非常重要的历史意义，</p>
+<p>因为它是最早教授给马来教师的核心科目之一，</p>
+<p>让他们理解地图绘制、自然资源和国家地缘政治。</p>
+<br><br>
+<p>从设计角度来看，这座建筑保留了殖民美学，</p>
+<p>通过陡峭的屋顶(Bumbung Curam)结构和标志性的通风孔，</p>
+<p>同时在外墙加强了独特的浮雕(Arca Timbul)，</p>
+<p>展示世界地图作为人类探索历史的象征。</p>
+<br><br>
+<p>这种整合象征着知识从传统手工制图方法</p>
+<p>向现代地理信息系统（GIS）技术的转变。</p>
+<br><br>
+<p>这座建筑的存在唤起了对知识连续性的敬畏，</p>
+<p>这种连续性提升国家地理教育已超过一个世纪。</p>
+<br><br>
+<p>它傲然矗立，象征着将前辈教育工作者的奋斗怀旧</p>
+<p>与今天学生的学术抱负团结在一起的骄傲。</p>
+<br><br>
+<p>对这种历史遗产的热爱增强了我们继续保护地球可持续性</p>
+<p>并提升地理学知识的决心，为了未来的一代。</p>
+<br><br><br><br>
+<p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">The End</p>
+<p style="font-size: 18px; margin-top: 20px;">Thank you for playing</p>
+`
+},
+BM: {
+l1_intro: "Perasaan ingin tahu membawa anda ke sini... Adakah ini lukisan Van Gogh?",
+l1_star1: "【Gema 2005】\nBangunan ini dirasmikan pada 2005. Lihat bumbung curam dan lubang pengudaraan itu, ia mengekalkan estetika kolonial untuk iklim tropika.",
+l2_intro: "Bilik ini kelihatan usang... Penuh dengan peralatan lama.",
+l2_star1: "【Warisan 1922】\nDi sini terletaknya jiwa SITC. Geografi adalah antara subjek teras terawal, mengajar guru Melayu memahami tanah air dan dunia.",
+l3_intro: "Ruang semakin herot! Arca di dinding seakan hidup! Lari!",
+l3_star1: "【Evolusi Eksplorasi】\nArca timbul ini menceritakan sejarah eksplorasi. Dari peta manual ke sistem GIS moden, ilmu geografi terus berkembang.",
+level1_complete: "【Bab 1: Kebangkitan】\nAnda mengumpulkan semua serpihan memori di kawasan ini. Bangunan itu menjawab, bintang di dinding mula mengalir, seolah-olah sesuatu akan bangkit.\n\n" +
+"Makmal Geografi ini merupakan pusat kecemerlangan di bawah Fakulti Sains Kemanusiaan yang dirasmikan pada tahun 2005 bagi meneruskan legasi pengajian Geografi yang telah bermula sejak era Sultan Idris Training College (SITC) pada tahun 1922.\n\n" +
+"Disiplin Geografi mempunyai sejarah yang sangat signifikan di Tanjong Malim kerana ia merupakan antara subjek teras terawal yang diajar kepada guru-guru Melayu untuk memahami pemetaan, sumber alam, dan geopolitik negara.",
+level2_complete: "【Bab 2: Kenangan】\nDengan lebih banyak memori dipulihkan, masa lalu bangunan menjadi lebih jelas. Jiwa tahun 1922 dan nyawa baru tahun 2005 bersatu di sini.\n\n" +
+"Dari aspek reka bentuk, bangunan ini mengekalkan estetika kolonial melalui struktur bumbung curam dan lubang pengudaraan ikonik, namun diperkasakan dengan arca timbul unik pada dinding luar yang memaparkan peta dunia sebagai simbol sejarah eksplorasi manusia.\n\n" +
+"Integrasi ini melambangkan transisi ilmu daripada kaedah pemetaan manual tradisional kepada teknologi Sistem Maklumat Geografi (GIS) yang serba moden.",
+level3_complete: "【Bab Akhir: Warisan】\nSemua memori telah dikumpulkan sepenuhnya. Emosi bangunan telah tenang sepenuhnya, warisan Geografi akan berterusan selamanya.\n\n" +
+"Kehadiran bangunan ini membangkitkan rasa takzim terhadap kesinambungan intelektual yang telah memartabatkan pendidikan geografi tanah air selama lebih satu abad.\n\n" +
+"Ia berdiri teguh sebagai simbol kebanggaan yang menyatukan nostalgia perjuangan pendidik terdahulu dengan aspirasi akademik mahasiswa masa kini.\n\n" +
+"Perasaan cinta akan warisan sejarah ini memperkukuh azam kami untuk terus memelihara kelestarian bumi serta memartabatkan ilmu geografi demi masa depan generasi akan datang.",
+next_btn: "Teruskan",
+game_over: "TAMAT PERMAINAN",
+btn_retry: "Cuba Lagi",
+hit_warning: "AWAS! Hantu itu...",
+ending_credits: `
+<h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
+<p>【Bab Akhir: Warisan】</p>
+<p>Semua memori telah dikumpulkan sepenuhnya.</p>
+<p>Emosi bangunan telah tenang sepenuhnya, warisan Geografi akan berterusan selamanya.</p>
+<br><br>
+<p>Makmal Geografi ini merupakan pusat kecemerlangan</p>
+<p>di bawah Fakulti Sains Kemanusiaan yang dirasmikan pada tahun 2005</p>
+<p>bagi meneruskan legasi pengajian Geografi yang telah bermula</p>
+<p>sejak era Sultan Idris Training College (SITC) pada tahun 1922.</p>
+<br><br>
+<p>Disiplin Geografi mempunyai sejarah yang sangat signifikan di Tanjong Malim</p>
+<p>kerana ia merupakan antara subjek teras terawal yang diajar kepada guru-guru Melayu</p>
+<p>untuk memahami pemetaan, sumber alam, dan geopolitik negara.</p>
+<br><br>
+<p>Dari aspek reka bentuk, bangunan ini mengekalkan estetika kolonial</p>
+<p>melalui struktur bumbung curam dan lubang pengudaraan ikonik,</p>
+<p>namun diperkasakan dengan arca timbul unik pada dinding luar</p>
+<p>yang memaparkan peta dunia sebagai simbol sejarah eksplorasi manusia.</p>
+<br><br>
+<p>Integrasi ini melambangkan transisi ilmu daripada kaedah pemetaan manual tradisional</p>
+<p>kepada teknologi Sistem Maklumat Geografi (GIS) yang serba moden.</p>
+<br><br>
+<p>Kehadiran bangunan ini membangkitkan rasa takzim terhadap kesinambungan intelektual</p>
+<p>yang telah memartabatkan pendidikan geografi tanah air selama lebih satu abad.</p>
+<br><br>
+<p>Ia berdiri teguh sebagai simbol kebanggaan yang menyatukan</p>
+<p>nostalgia perjuangan pendidik terdahulu dengan aspirasi akademik mahasiswa masa kini.</p>
+<br><br>
+<p>Perasaan cinta akan warisan sejarah ini memperkukuh azam kami</p>
+<p>untuk terus memelihara kelestarian bumi serta memartabatkan ilmu geografi</p>
+<p>demi masa depan generasi akan datang.</p>
+<br><br><br><br>
+<p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">Tamatt</p>
+<p style="font-size: 18px; margin-top: 20px;">Terima kasih kerana bermain</p>
+`
+},
+EN: {
+l1_intro: "Curiosity led you inside... Is this a Van Gogh painting?",
+l1_star1: "【Echoes of 2005】\nBuilt in 2005, this lab features steep roofs and iconic ventilation holes, preserving colonial aesthetics for the tropical climate.",
+l2_intro: "The room feels older... cluttered with vintage equipment.",
+l2_star1: "【Legacy of 1922】\nThis site inherits the soul of SITC. Geography was a core subject, teaching Malay teachers to understand their land and geopolitics.",
+l3_intro: "Reality is twisting! The wall reliefs are moving! Run!",
+l3_star1: "【Evolution of Exploration】\nThe wall reliefs (Arca Timbul) tell the story of exploration. From manual mapping to modern GIS, our quest for knowledge never ends.",
+level1_complete: "【Chapter 1: Awakening】\nYou collected all memory fragments in this area. The building responds, stars on walls begin to flow as if something is awakening.\n\n" +
+"This Geography Laboratory is a center of excellence under the Faculty of Human Sciences inaugurated in 2005 to continue the legacy of Geography studies that began since the era of Sultan Idris Training College (SITC) in 1922.\n\n" +
+"The discipline of Geography has a very significant history in Tanjong Malim as it was one of the earliest core subjects taught to Malay teachers to understand mapping, natural resources, and national geopolitics.",
+level2_complete: "【Chapter 2: Remembrance】\nWith more memories restored, the building's past becomes clearer. The soul of 1922 and new life of 2005 intertwine here.\n\n" +
+"In terms of design, this building preserves colonial aesthetics through its steep roof structure and iconic ventilation holes, yet is strengthened by unique bas-reliefs on the exterior walls displaying a world map as a symbol of human exploration history.\n\n" +
+"This integration symbolizes the transition of knowledge from traditional manual mapping methods to modern Geographic Information System (GIS) technology.",
+level3_complete: "【Final Chapter: Legacy】\nAll memories have been collected. The building's emotions are completely soothed, the legacy of Geography will continue forever.\n\n" +
+"The presence of this building evokes reverence for the intellectual continuity that has elevated geography education in the homeland for over a century.\n\n" +
+"It stands proudly as a symbol of pride that unites the nostalgia of previous educators' struggles with the academic aspirations of today's students.\n\n" +
+"This love for historical heritage strengthens our resolve to continue preserving earth's sustainability and elevating geography knowledge for future generations.",
+next_btn: "Continue",
+game_over: "GAME OVER",
+btn_retry: "Try Again",
+hit_warning: "OUCH! Watch out for those shadows...",
+ending_credits: `
+<h1 style="font-family: 'Dancing Script', cursive; font-size: 48px; color: #f9d71c; margin-bottom: 30px;">Starry Echoes</h1>
+<p>【Final Chapter: Legacy】</p>
+<p>All memories have been collected.</p>
+<p>The building's emotions are completely soothed, the legacy of Geography will continue forever.</p>
+<br><br>
+<p>This Geography Laboratory is a center of excellence under the Faculty of Human Sciences,</p>
+<p>inaugurated in 2005 to continue the legacy of Geography studies that began</p>
+<p>since the era of Sultan Idris Training College (SITC) in 1922.</p>
+<br><br>
+<p>The discipline of Geography has a very significant history in Tanjong Malim</p>
+<p>as it was one of the earliest core subjects taught to Malay teachers</p>
+<p>to understand mapping, natural resources, and national geopolitics.</p>
+<br><br>
+<p>In terms of design, this building preserves colonial aesthetics</p>
+<p>through its steep roof structure and iconic ventilation holes,</p>
+<p>yet is strengthened by unique bas-reliefs on the exterior walls</p>
+<p>displaying a world map as a symbol of human exploration history.</p>
+<br><br>
+<p>This integration symbolizes the transition of knowledge</p>
+<p>from traditional manual mapping methods to modern Geographic Information System (GIS) technology.</p>
+<br><br>
+<p>The presence of this building evokes reverence for the intellectual continuity</p>
+<p>that has elevated geography education in the homeland for over a century.</p>
+<br><br>
+<p>It stands proudly as a symbol of pride that unites the nostalgia of previous educators' struggles</p>
+<p>with the academic aspirations of today's students.</p>
+<br><br>
+<p>This love for historical heritage strengthens our resolve to continue preserving earth's sustainability</p>
+<p>and elevating geography knowledge for future generations.</p>
+<br><br><br><br>
+<p style="font-family: 'Dancing Script', cursive; font-size: 36px; color: #f9d71c;">The End</p>
+<p style="font-size: 18px; margin-top: 20px;">Thank you for playing</p>
+`
+}
 };
-
 const CANVAS = document.getElementById('gameCanvas');
 const CTX = CANVAS.getContext('2d');
 const MASK_CANVAS = document.createElement('canvas');
 const MASK_CTX = MASK_CANVAS.getContext('2d', { willReadFrequently: true });
-
-// ==================== ⚡ 调整速度：第一关稍微调慢，保持关卡递增节奏 ====================
+// ==================== ⚡ 关卡速度配置：已降速 ====================
 const LEVEL_CONFIG = {
-    1: { p_speed: 2.5, g_speed: 1.1 },  // 第一关：鬼速度从1.3降到1.1，更适中
-    2: { p_speed: 2.8, g_speed: 1.4 },  // 第二关：相应调整
-    3: { p_speed: 3.2, g_speed: 1.7 }   // 第三关：最高难度
+1: { p_speed: 1.8, g_speed: 0.6 },  // ⚡ 极大幅度降速：确保所有人都能玩
+2: { p_speed: 2.0, g_speed: 0.9 },  // ⚡ 适度提速
+3: { p_speed: 2.3, g_speed: 1.2 }   // ⚡ 最终关卡，比之前最慢的还要慢一点
 };
-
 const PLAYER_SIZE = 24;
 const HITBOX_SIZE = 14;
 const GHOST_SIZE = 30;
 const GRID_SIZE = 60;
 const ANIMATION_SPEED = 200;
 const WIN_COLOR = { r: 84, g: 128, b: 100 };
-
 let currentLang = 'CN';
 let currentLevel = 1;
 let gameRunning = false;
@@ -533,1076 +510,998 @@ let musicPlaying = false;
 let animationFrame = 0;
 let lastAnimationTime = 0;
 let isMoving = false;
-
 // ==================== 🔧 死亡状态标记：确保只触发一次 ====================
-let player = { 
-    x: 0, 
-    y: 0, 
-    dx: 0, 
-    dy: 0, 
-    invulnerable: 0, 
-    angle: 0,
-    isDead: false
+let player = {
+x: 0,
+y: 0,
+dx: 0,
+dy: 0,
+invulnerable: 0,
+angle: 0,
+isDead: false
 };
 let ghosts = [];
 let dots = [];
 let bigStars = [];
 let keys = {};
 let joystick = { active: false, dx: 0, dy: 0, originX: 0, originY: 0 };
-
 let bgImg, maskImg, levelStoryImgs = [];
 let playerImgs = { up: [], down: [], left: [], right: [] };
 let ghostImgs = { up: [], down: [], left: [], right: [] };
 let bgMusicElement;
-
 const SFX = {
-    collision: new Audio('sfx_collision.mp3'),
-    bigStar: new Audio('sfx_bigstar.mp3'),
-    gameOver: new Audio('sfx_gameover.mp3'),
-    gameWin: new Audio('sfx_gamewin.mp3'),
-    dot: new Audio('sfx_dot.mp3'),
-    volume: 0.4
+collision: new Audio('sfx_collision.mp3'),
+bigStar: new Audio('sfx_bigstar.mp3'),
+gameOver: new Audio('sfx_gameover.mp3'),
+gameWin: new Audio('sfx_gamewin.mp3'),
+dot: new Audio('sfx_dot.mp3'),
+volume: 0.4
 };
-
 function getText(key) {
-    return TEXT_DATA[currentLang][key] || key;
+return TEXT_DATA[currentLang][key] || key;
 }
-
 function playSound(soundName) {
-    if (!SFX[soundName]) return;
-    
-    const sound = SFX[soundName];
-    
-    if (bgMusicElement && musicPlaying && !bgMusicElement.paused) {
-        if (soundName === 'gameOver' || soundName === 'gameWin' || soundName === 'collision') {
-            bgMusicElement.pause();
-        }
-    }
-    
-    sound.currentTime = 0;
-    sound.play().catch(e => console.log(`音效播放失败: ${soundName}`, e));
-    
-    sound.onended = () => {
-        if (bgMusicElement && musicPlaying && soundName !== 'gameOver' && soundName !== 'gameWin') {
-            bgMusicElement.play().catch(e => console.log('恢复音乐失败', e));
-        }
-    };
+if (!SFX[soundName]) return;
+
+const sound = SFX[soundName];
+
+if (bgMusicElement && musicPlaying && !bgMusicElement.paused) {
+if (soundName === 'gameOver' || soundName === 'gameWin' || soundName === 'collision') {
+bgMusicElement.pause();
+}
 }
 
+sound.currentTime = 0;
+sound.play().catch(e => console.log(`音效播放失败: ${soundName}`, e));
+
+sound.onended = () => {
+if (bgMusicElement && musicPlaying && soundName !== 'gameOver' && soundName !== 'gameWin') {
+bgMusicElement.play().catch(e => console.log('恢复音乐失败', e));
+}
+};
+}
 function toggleMusic() {
-    if (!bgMusicElement) return;
-    const btn = document.getElementById('music-btn');
-    if (!btn) return;
-    
-    if (musicPlaying) {
-        bgMusicElement.pause();
-        btn.textContent = '🔇';
-    } else {
-        bgMusicElement.play().catch(e => {
-            console.log('音乐播放失败:', e);
-            alert('音乐播放失败，请确保bgm.mp3文件存在');
-        });
-        btn.textContent = '🎵';
-    }
-    musicPlaying = !musicPlaying;
-}
+if (!bgMusicElement) return;
+const btn = document.getElementById('music-btn');
+if (!btn) return;
 
+if (musicPlaying) {
+bgMusicElement.pause();
+btn.textContent = '🔇';
+} else {
+bgMusicElement.play().catch(e => {
+console.log('音乐播放失败:', e);
+alert('音乐播放失败，请确保bgm.mp3文件存在');
+});
+btn.textContent = '🎵';
+}
+musicPlaying = !musicPlaying;
+}
 function selectLang(lang) {
-    currentLang = lang;
-    const startScreen = document.getElementById('start-screen');
-    if (startScreen) {
-        startScreen.classList.add('hidden');
-    }
-    initLevel(1);
+currentLang = lang;
+const startScreen = document.getElementById('start-screen');
+if (startScreen) {
+startScreen.classList.add('hidden');
 }
-
+initLevel(1);
+}
 function initLevel(lvl) {
-    // ==================== 🔧 重置死亡状态 ====================
-    player.isDead = false;
-    currentLevel = lvl;
-    isPaused = true;
-    gameRunning = false;
+// ==================== 🔧 重置死亡状态 ====================
+player.isDead = false;
+currentLevel = lvl;
+isPaused = true;
+gameRunning = false;
+bgImg = new Image();
+maskImg = new Image();
+bgImg.loaded = false;
+maskImg.loaded = false;
+let loadedCount = 0;
 
-    bgImg = new Image();
-    maskImg = new Image();
-    bgImg.loaded = false;
-    maskImg.loaded = false;
-
-    let loadedCount = 0;
-    
-    const checkAllLoaded = () => {
-        loadedCount++;
-        if (loadedCount >= 2) {
-            console.log(`关卡 ${lvl} 资源加载完成，准备初始化世界...`);
-            setupGameWorld();
-        }
-    };
-
-    const timestamp = Date.now();
-    const bgUrl = `bg_level${lvl}.jpg?v=${timestamp}`;
-    const maskUrl = `mask_level${lvl}.jpg?v=${timestamp}`;
-
-    console.log(`🔄 开始加载关卡 ${lvl} 资源...`);
-    console.log(`   背景图: ${bgUrl}`);
-    console.log(`   遮罩图: ${maskUrl}`);
-
-    bgImg.onload = async () => {
-        try {
-            await bgImg.decode();
-            bgImg.loaded = true;
-            console.log(`✅ 背景图解码成功: Level ${lvl}`);
-        } catch(e) {
-            console.error(`❌ 背景图解码失败: ${e.message}`);
-            bgImg.loaded = false;
-        }
-        checkAllLoaded();
-    };
-
-    maskImg.onload = async () => {
-        try {
-            await maskImg.decode();
-            maskImg.loaded = true;
-            console.log(`✅ 遮罩图解码成功: Level ${lvl}`);
-        } catch(e) {
-            console.error(`❌ 遮罩图解码失败: ${e.message}`);
-            maskImg.loaded = false;
-        }
-        checkAllLoaded();
-    };
-
-    bgImg.onerror = () => {
-        console.error(`❌ 背景图加载失败: ${bgUrl}`);
-        console.error(`   请检查文件路径: ${window.location.href}bg_level${lvl}.jpg`);
-        bgImg.loaded = false;
-        checkAllLoaded();
-    };
-
-    maskImg.onerror = () => {
-        console.error(`❌ 遮罩图加载失败: ${maskUrl}`);
-        console.error(`   请检查文件路径: ${window.location.href}mask_level${lvl}.jpg`);
-        maskImg.loaded = false;
-        checkAllLoaded();
-    };
-
-    bgImg.src = bgUrl;
-    maskImg.src = maskUrl;
+const checkAllLoaded = () => {
+loadedCount++;
+if (loadedCount >= 2) {
+console.log(`关卡 ${lvl} 资源加载完成，准备初始化世界...`);
+setupGameWorld();
 }
-
+};
+const timestamp = Date.now();
+const bgUrl = `bg_level${lvl}.jpg?v=${timestamp}`;
+const maskUrl = `mask_level${lvl}.jpg?v=${timestamp}`;
+console.log(`🔄 开始加载关卡 ${lvl} 资源...`);
+console.log(`   背景图: ${bgUrl}`);
+console.log(`   遮罩图: ${maskUrl}`);
+bgImg.onload = async () => {
+try {
+await bgImg.decode();
+bgImg.loaded = true;
+console.log(`✅ 背景图解码成功: Level ${lvl}`);
+} catch(e) {
+console.error(`❌ 背景图解码失败: ${e.message}`);
+bgImg.loaded = false;
+}
+checkAllLoaded();
+};
+maskImg.onload = async () => {
+try {
+await maskImg.decode();
+maskImg.loaded = true;
+console.log(`✅ 遮罩图解码成功: Level ${lvl}`);
+} catch(e) {
+console.error(`❌ 遮罩图解码失败: ${e.message}`);
+maskImg.loaded = false;
+}
+checkAllLoaded();
+};
+bgImg.onerror = () => {
+console.error(`❌ 背景图加载失败: ${bgUrl}`);
+console.error(`   请检查文件路径: ${window.location.href}bg_level${lvl}.jpg`);
+bgImg.loaded = false;
+checkAllLoaded();
+};
+maskImg.onerror = () => {
+console.error(`❌ 遮罩图加载失败: ${maskUrl}`);
+console.error(`   请检查文件路径: ${window.location.href}mask_level${lvl}.jpg`);
+maskImg.loaded = false;
+checkAllLoaded();
+};
+bgImg.src = bgUrl;
+maskImg.src = maskUrl;
+}
 function nextLevel() {
-    const resultModal = document.getElementById('result-modal');
-    if (resultModal) resultModal.classList.add('hidden');
-    if (currentLevel < 3) {
-        initLevel(currentLevel + 1);
-    } else {
-        showEndingScreen();
-    }
+const resultModal = document.getElementById('result-modal');
+if (resultModal) resultModal.classList.add('hidden');
+if (currentLevel < 3) {
+initLevel(currentLevel + 1);
+} else {
+showEndingScreen();
 }
-
+}
 function setupCanvasScaling() {
-    const container = document.getElementById('canvas-container');
-    const originalWidth = CANVAS.width;
-    const originalHeight = CANVAS.height;
-    
-    function resizeCanvas() {
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const scale = Math.min(screenWidth / originalWidth, screenHeight / originalHeight);
-        
-        const newWidth = Math.floor(originalWidth * scale);
-        const newHeight = Math.floor(originalHeight * scale);
-        
-        container.style.width = newWidth + 'px';
-        container.style.height = newHeight + 'px';
-    }
-    
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+const container = document.getElementById('canvas-container');
+const originalWidth = CANVAS.width;
+const originalHeight = CANVAS.height;
+
+function resizeCanvas() {
+const screenWidth = window.innerWidth;
+const screenHeight = window.innerHeight;
+const scale = Math.min(screenWidth / originalWidth, screenHeight / originalHeight);
+
+const newWidth = Math.floor(originalWidth * scale);
+const newHeight = Math.floor(originalHeight * scale);
+
+container.style.width = newWidth + 'px';
+container.style.height = newHeight + 'px';
 }
 
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+}
 function setupGameWorld() {
-    if (!bgImg || !maskImg) {
-        console.error('❌ 图片未初始化');
-        return;
-    }
-    
-    CANVAS.width = MASK_CANVAS.width = bgImg.naturalWidth || 800;
-    CANVAS.height = MASK_CANVAS.height = bgImg.naturalHeight || 600;
-    
-    console.log(`📐 设置画布尺寸: ${CANVAS.width}x${CANVAS.height}`);
-    
-    if (maskImg.loaded && maskImg.complete) {
-        try {
-            MASK_CTX.drawImage(maskImg, 0, 0);
-            console.log('✅ 遮罩图已绘制到MASK_CTX');
-        } catch(e) {
-            console.error('❌ 遮罩图绘制失败:', e);
-            createFallbackMask();
-        }
-    } else {
-        console.warn('⚠️ 遮罩图未加载，创建备用遮罩');
-        createFallbackMask();
-    }
-    
-    CTX.imageSmoothingEnabled = false;
-    setupCanvasScaling();
-
-    let startPos = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
-    player.x = startPos.x;
-    player.y = startPos.y;
-    player.invulnerable = 0;
-    player.angle = 0;
-    player.isDead = false;
-
-    ghosts = [];
-    // ==================== ⚡ 难度升级：第一关有2个鬼，第二关3个，第三关4个 ====================
-    let ghostCount = currentLevel + 1;
-    
-    for(let i = 0; i < ghostCount; i++) {
-        // ==================== ⚡ 位置调整：鬼魂更靠近中心"隘口" ====================
-        let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120;
-        let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80;
-        
-        let gPos = findSafeSpot(ghostSpawnX, ghostSpawnY, HITBOX_SIZE);
-        
-        let attempts = 0;
-        while(checkCollision(gPos.x, gPos.y, HITBOX_SIZE) && attempts < 50) {
-            gPos.x = ghostSpawnX + (Math.random() - 0.5) * 100;
-            gPos.y = ghostSpawnY + (Math.random() - 0.5) * 60;
-            attempts++;
-        }
-        
-        ghosts.push({ 
-            x: gPos.x, 
-            y: gPos.y, 
-            angle: Math.PI
-        });
-    }
-
-    generateDotsAndStars();
-
-    showStory(getText(`l${currentLevel}_intro`));
-    
-    gameRunning = true;
-    isPaused = true;
-    updateHUD();
-    requestAnimationFrame(gameLoop);
+if (!bgImg || !maskImg) {
+console.error('❌ 图片未初始化');
+return;
 }
 
+CANVAS.width = MASK_CANVAS.width = bgImg.naturalWidth || 800;
+CANVAS.height = MASK_CANVAS.height = bgImg.naturalHeight || 600;
+
+console.log(`📐 设置画布尺寸: ${CANVAS.width}x${CANVAS.height}`);
+
+if (maskImg.loaded && maskImg.complete) {
+try {
+MASK_CTX.drawImage(maskImg, 0, 0);
+console.log('✅ 遮罩图已绘制到MASK_CTX');
+} catch(e) {
+console.error('❌ 遮罩图绘制失败:', e);
+createFallbackMask();
+}
+} else {
+console.warn('⚠️ 遮罩图未加载，创建备用遮罩');
+createFallbackMask();
+}
+
+CTX.imageSmoothingEnabled = false;
+setupCanvasScaling();
+let startPos = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
+player.x = startPos.x;
+player.y = startPos.y;
+player.invulnerable = 0;
+player.angle = 0;
+player.isDead = false;
+ghosts = [];
+// ==================== ⚡ 难度升级：第一关有2个鬼，第二关3个，第三关4个 ====================
+let ghostCount = currentLevel + 1;
+
+for(let i = 0; i < ghostCount; i++) {
+// ==================== ⚡ 位置调整：鬼魂更靠近中心"隘口" ====================
+let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120; // 更靠近中心区域
+let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80; // 在必经之路上形成交叉巡逻
+
+let gPos = findSafeSpot(ghostSpawnX, ghostSpawnY, HITBOX_SIZE);
+
+let attempts = 0;
+while(checkCollision(gPos.x, gPos.y, HITBOX_SIZE) && attempts < 50) {
+gPos.x = ghostSpawnX + (Math.random() - 0.5) * 100;
+gPos.y = ghostSpawnY + (Math.random() - 0.5) * 60;
+attempts++;
+}
+
+ghosts.push({
+x: gPos.x,
+y: gPos.y,
+angle: Math.PI
+});
+}
+generateDotsAndStars();
+showStory(getText(`l${currentLevel}_intro`));
+
+gameRunning = true;
+isPaused = true;
+updateHUD();
+requestAnimationFrame(gameLoop);
+}
 function createFallbackMask() {
-    MASK_CTX.fillStyle = '#ffffff';
-    MASK_CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    MASK_CTX.fillStyle = '#548064';
-    MASK_CTX.fillRect(CANVAS.width - 150, 0, 150, CANVAS.height);
-    console.log('✅ 备用遮罩已创建（包含绿色通关区域）');
+MASK_CTX.fillStyle = '#ffffff';
+MASK_CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
+MASK_CTX.fillStyle = '#548064';
+MASK_CTX.fillRect(CANVAS.width - 150, 0, 150, CANVAS.height);
+console.log('✅ 备用遮罩已创建（包含绿色通关区域）');
 }
-
 function generateDotsAndStars() {
-    dots = [];
-    bigStars = [];
-    let w = CANVAS.width;
-    let h = CANVAS.height;
+dots = [];
+bigStars = [];
+let w = CANVAS.width;
+let h = CANVAS.height;
+for(let y = 60; y < h - 60; y += GRID_SIZE) {
+for(let x = 60; x < w - 60; x += GRID_SIZE) {
+if(!checkCollision(x, y, 8)) {
+dots.push({
+x: x,
+y: y,
+active: true,
+phase: Math.random() * Math.PI * 2,
+freq: 0.05 + Math.random() * 0.05,
+size: 8
+});
+}
+}
+}
+totalDots = dots.length;
+collectedDots = 0;
+let starSize = 30;
+let attempts = 0;
+let starPos = null;
 
-    for(let y = 60; y < h - 60; y += GRID_SIZE) {
-        for(let x = 60; x < w - 60; x += GRID_SIZE) {
-            if(!checkCollision(x, y, 8)) {
-                dots.push({ 
-                    x: x, 
-                    y: y, 
-                    active: true,
-                    phase: Math.random() * Math.PI * 2,
-                    freq: 0.05 + Math.random() * 0.05,
-                    size: 8
-                });
-            }
-        }
-    }
-    totalDots = dots.length;
-    collectedDots = 0;
-
-    let starSize = 30;
-    let attempts = 0;
-    let starPos = null;
-    
-    while(!starPos && attempts < 100) {
-        let testX = w/2 + (Math.random() - 0.5) * 300;
-        let testY = h/2 + (Math.random() - 0.5) * 200;
-        if(!checkCollision(testX, testY, starSize)) {
-            starPos = {x: testX, y: testY};
-        }
-        attempts++;
-    }
-    
-    if(!starPos) {
-        starPos = findSafeSpot(w/2, h/2, starSize);
-    }
-    
-    bigStars.push({ 
-        x: starPos.x, 
-        y: starPos.y, 
-        textKey: `l${currentLevel}_star1`, 
-        active: true, 
-        size: starSize,
-        phase: Math.random() * Math.PI * 2,
-        freq: 0.03 + Math.random() * 0.02
-    });
+while(!starPos && attempts < 100) {
+let testX = w/2 + (Math.random() - 0.5) * 300;
+let testY = h/2 + (Math.random() - 0.5) * 200;
+if(!checkCollision(testX, testY, starSize)) {
+starPos = {x: testX, y: testY};
+}
+attempts++;
 }
 
+if(!starPos) {
+starPos = findSafeSpot(w/2, h/2, starSize);
+}
+
+bigStars.push({
+x: starPos.x,
+y: starPos.y,
+textKey: `l${currentLevel}_star1`,
+active: true,
+size: starSize,
+phase: Math.random() * Math.PI * 2,
+freq: 0.03 + Math.random() * 0.02
+});
+}
 function update() {
-    if(!gameRunning || isPaused || player.isDead) return;
+if(!gameRunning || isPaused || player.isDead) return;
+animationFrame++;
 
-    animationFrame++;
-    
-    let dx = 0, dy = 0;
-    isMoving = false;
-    
-    if (keys['ArrowUp']) { dy -= 1; isMoving = true; }
-    if (keys['ArrowDown']) { dy += 1; isMoving = true; }
-    if (keys['ArrowLeft']) { dx -= 1; isMoving = true; }
-    if (keys['ArrowRight']) { dx += 1; isMoving = true; }
-    
-    if (joystick.active) {
-        dx = joystick.dx;
-        dy = joystick.dy;
-        isMoving = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
-    }
+let dx = 0, dy = 0;
+isMoving = false;
 
-    if (dx !== 0 || dy !== 0) {
-        let len = Math.hypot(dx, dy);
-        if (len > 0.1) {
-            player.angle = Math.atan2(dy, dx);
-            
-            const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
-            let pSpeed = config.p_speed;
-            
-            dx = (dx / len) * pSpeed;
-            dy = (dy / len) * pSpeed;
-            moveWithPhysics(player, dx, dy, HITBOX_SIZE);
-        }
-    }
+if (keys['ArrowUp']) { dy -= 1; isMoving = true; }
+if (keys['ArrowDown']) { dy += 1; isMoving = true; }
+if (keys['ArrowLeft']) { dx -= 1; isMoving = true; }
+if (keys['ArrowRight']) { dx += 1; isMoving = true; }
 
-    const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
-    let gSpeed = config.g_speed;
+if (joystick.active) {
+dx = joystick.dx;
+dy = joystick.dy;
+isMoving = Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
+}
+if (dx !== 0 || dy !== 0) {
+let len = Math.hypot(dx, dy);
+if (len > 0.1) {
+player.angle = Math.atan2(dy, dx);
 
-    if (!player.isDead) {
-        ghosts.forEach(g => {
-            let tx = player.x - g.x;
-            let ty = player.y - g.y;
-            let dist = Math.hypot(tx, ty);
-            let targetAngle = Math.atan2(ty, tx);
+const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
+let pSpeed = config.p_speed;
 
-            g.angle = targetAngle;
+dx = (dx / len) * pSpeed;
+dy = (dy / len) * pSpeed;
+moveWithPhysics(player, dx, dy, HITBOX_SIZE);
+}
+}
+const config = LEVEL_CONFIG[currentLevel] || LEVEL_CONFIG[1];
+let gSpeed = config.g_speed;
+if (!player.isDead) {
+ghosts.forEach(g => {
+let tx = player.x - g.x;
+let ty = player.y - g.y;
+let dist = Math.hypot(tx, ty);
+let targetAngle = Math.atan2(ty, tx);
+g.angle = targetAngle;
+let nextX = g.x + Math.cos(g.angle) * gSpeed;
+let nextY = g.y + Math.sin(g.angle) * gSpeed;
 
-            let nextX = g.x + Math.cos(g.angle) * gSpeed;
-            let nextY = g.y + Math.sin(g.angle) * gSpeed;
-            
-            if (checkCollision(nextX, nextY, HITBOX_SIZE)) {
-                let found = false;
-                for (let offset = 0.5; offset < Math.PI * 2; offset += 0.5) {
-                    let testAngle1 = g.angle + offset;
-                    let testAngle2 = g.angle - offset;
-                    
-                    nextX = g.x + Math.cos(testAngle1) * gSpeed;
-                    nextY = g.y + Math.sin(testAngle1) * gSpeed;
-                    if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
-                        g.angle = testAngle1;
-                        found = true;
-                        break;
-                    }
-                    
-                    nextX = g.x + Math.cos(testAngle2) * gSpeed;
-                    nextY = g.y + Math.sin(testAngle2) * gSpeed;
-                    if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
-                        g.angle = testAngle2;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    g.angle += 0.1;
-                    return;
-                }
-            }
+if (checkCollision(nextX, nextY, HITBOX_SIZE)) {
+let found = false;
+for (let offset = 0.5; offset < Math.PI * 2; offset += 0.5) {
+let testAngle1 = g.angle + offset;
+let testAngle2 = g.angle - offset;
 
-            moveWithPhysics(g, Math.cos(g.angle) * gSpeed, Math.sin(g.angle) * gSpeed, HITBOX_SIZE);
-
-            if (dist < HITBOX_SIZE + GHOST_SIZE && player.invulnerable <= 0) {
-                playerHit();
-            }
-        });
-    }
-
-    if (player.invulnerable > 0) player.invulnerable--;
-
-    dots.forEach(d => {
-        if (d.active && Math.hypot(player.x - d.x, player.y - d.y) < HITBOX_SIZE + 12) {
-            d.active = false;
-            collectedDots++;
-            playSound('dot');
-            updateHUD();
-        }
-    });
-
-    bigStars.forEach(s => {
-        if (s.active && Math.hypot(player.x - s.x, player.y - s.y) < HITBOX_SIZE + 20) {
-            s.active = false;
-            playSound('bigStar');
-            let text = getText(s.textKey);
-            showStory(text);
-        }
-    });
-
-    let progress = collectedDots / totalDots;
-    if (progress >= 0.8 && checkWinArea(player.x, player.y)) {
-        levelWin();
-    }
+nextX = g.x + Math.cos(testAngle1) * gSpeed;
+nextY = g.y + Math.sin(testAngle1) * gSpeed;
+if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
+g.angle = testAngle1;
+found = true;
+break;
 }
 
+nextX = g.x + Math.cos(testAngle2) * gSpeed;
+nextY = g.y + Math.sin(testAngle2) * gSpeed;
+if (!checkCollision(nextX, nextY, HITBOX_SIZE)) {
+g.angle = testAngle2;
+found = true;
+break;
+}
+}
+if (!found) {
+g.angle += 0.1;
+return;
+}
+}
+moveWithPhysics(g, Math.cos(g.angle) * gSpeed, Math.sin(g.angle) * gSpeed, HITBOX_SIZE);
+if (dist < HITBOX_SIZE + GHOST_SIZE && player.invulnerable <= 0) {
+playerHit();
+}
+});
+}
+if (player.invulnerable > 0) player.invulnerable--;
+dots.forEach(d => {
+if (d.active && Math.hypot(player.x - d.x, player.y - d.y) < HITBOX_SIZE + 12) {
+d.active = false;
+collectedDots++;
+playSound('dot');
+updateHUD();
+}
+});
+bigStars.forEach(s => {
+if (s.active && Math.hypot(player.x - s.x, player.y - s.y) < HITBOX_SIZE + 20) {
+s.active = false;
+playSound('bigStar');
+let text = getText(s.textKey);
+showStory(text);
+}
+});
+let progress = collectedDots / totalDots;
+if (progress >= 0.8 && checkWinArea(player.x, player.y)) {
+levelWin();
+}
+}
 function checkWinArea(x, y) {
-    if (!MASK_CTX || x < 0 || x >= MASK_CANVAS.width || y < 0 || y >= MASK_CANVAS.height) return false;
-    
-    const pixelData = MASK_CTX.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-    const r = pixelData[0];
-    const g = pixelData[1];
-    const b = pixelData[2];
-    
-    const tolerance = 30;
-    const isGreen = Math.abs(r - WIN_COLOR.r) < tolerance && 
-                    Math.abs(g - WIN_COLOR.g) < tolerance && 
-                    Math.abs(b - WIN_COLOR.b) < tolerance;
-    
-    if (isGreen) {
-        const progress = collectedDots / totalDots;
-        if (progress >= 0.8) {
-            return true;
-        } else {
-            const required = Math.ceil(totalDots * 0.8);
-            const remaining = required - collectedDots;
-            alert(`还需要收集 ${remaining} 个星星！`);
-            return false;
-        }
-    }
-    
-    return false;
+if (!MASK_CTX || x < 0 || x >= MASK_CANVAS.width || y < 0 || y >= MASK_CANVAS.height) return false;
+
+const pixelData = MASK_CTX.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+const r = pixelData[0];
+const g = pixelData[1];
+const b = pixelData[2];
+
+const tolerance = 30;
+const isGreen = Math.abs(r - WIN_COLOR.r) < tolerance &&
+Math.abs(g - WIN_COLOR.g) < tolerance &&
+Math.abs(b - WIN_COLOR.b) < tolerance;
+
+if (isGreen) {
+const progress = collectedDots / totalDots;
+if (progress >= 0.8) {
+return true;
+} else {
+const required = Math.ceil(totalDots * 0.8);
+const remaining = required - collectedDots;
+alert(`还需要收集 ${remaining} 个星星！`);
+return false;
+}
 }
 
+return false;
+}
 function getDirectionFromAngle(angle) {
-    const directions = ['right', 'down', 'left', 'up'];
-    const index = Math.round(angle / (Math.PI / 2)) & 3;
-    return directions[index];
+const directions = ['right', 'down', 'left', 'up'];
+const index = Math.round(angle / (Math.PI / 2)) & 3;
+return directions[index];
 }
-
 function drawStar(x, y, size, color, star) {
-    const blink = (Math.sin(animationFrame * star.freq + star.phase) + 1) * 0.5;
-    const opacity = 0.4 + blink * 0.6;
-    
-    CTX.save();
-    CTX.globalAlpha = opacity;
-    CTX.fillStyle = color;
-    
-    const spikes = 5;
-    const outerRadius = size;
-    const innerRadius = size * 0.5;
-    
-    CTX.beginPath();
-    for (let i = 0; i < spikes * 2; i++) {
-        const radius = i % 2 === 0 ? outerRadius : innerRadius;
-        const angle = (i * Math.PI) / spikes;
-        const px = x + Math.cos(angle) * radius;
-        const py = y + Math.sin(angle) * radius;
-        
-        if (i === 0) {
-            CTX.moveTo(px, py);
-        } else {
-            CTX.lineTo(px, py);
-        }
-    }
-    CTX.closePath();
-    CTX.fill();
-    CTX.restore();
-}
+const blink = (Math.sin(animationFrame * star.freq + star.phase) + 1) * 0.5;
+const opacity = 0.4 + blink * 0.6;
 
+CTX.save();
+CTX.globalAlpha = opacity;
+CTX.fillStyle = color;
+
+const spikes = 5;
+const outerRadius = size;
+const innerRadius = size * 0.5;
+
+CTX.beginPath();
+for (let i = 0; i < spikes * 2; i++) {
+const radius = i % 2 === 0 ? outerRadius : innerRadius;
+const angle = (i * Math.PI) / spikes;
+const px = x + Math.cos(angle) * radius;
+const py = y + Math.sin(angle) * radius;
+
+if (i === 0) {
+CTX.moveTo(px, py);
+} else {
+CTX.lineTo(px, py);
+}
+}
+CTX.closePath();
+CTX.fill();
+CTX.restore();
+}
 function draw() {
-    if (!gameRunning || !CTX) return;
-    
-    CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
-    
-    if (bgImg && bgImg.loaded && bgImg.complete && bgImg.naturalWidth > 0) {
-        try {
-            CTX.drawImage(bgImg, 0, 0);
-        } catch(e) {
-            console.error('背景图绘制失败:', e);
-        }
-    } else {
-        if (!window.bgDrawErrorLogged) {
-            console.warn('⚠️ 背景图不可用，使用备用背景');
-            window.bgDrawErrorLogged = true;
-        }
-        drawFallbackBackground();
-    }
+if (!gameRunning || !CTX) return;
 
-    dots.forEach(d => {
-        if(d.active) {
-            drawStar(d.x, d.y, 8, "#f9d71c", d);
-        }
-    });
+CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
-    bigStars.forEach(s => {
-        if(s.active) {
-            CTX.shadowBlur = 15;
-            CTX.shadowColor = "#f9d71c";
-            drawStar(s.x, s.y, s.size || 12, "#fff", s);
-            CTX.shadowBlur = 0;
-        }
-    });
+if (bgImg && bgImg.loaded && bgImg.complete && bgImg.naturalWidth > 0) {
+try {
+CTX.drawImage(bgImg, 0, 0);
+} catch(e) {
+console.error('背景图绘制失败:', e);
+}
+} else {
+if (!window.bgDrawErrorLogged) {
+console.warn('⚠️ 背景图不可用，使用备用背景');
+window.bgDrawErrorLogged = true;
+}
+drawFallbackBackground();
+}
+dots.forEach(d => {
+if(d.active) {
+drawStar(d.x, d.y, 8, "#f9d71c", d);
+}
+});
+bigStars.forEach(s => {
+if(s.active) {
+CTX.shadowBlur = 15;
+CTX.shadowColor = "#f9d71c";
+drawStar(s.x, s.y, s.size || 12, "#fff", s);
+CTX.shadowBlur = 0;
+}
+});
+if (!player.isDead) {
+const playerDir = getDirectionFromAngle(player.angle);
+let playerFrame = 0;
 
-    if (!player.isDead) {
-        const playerDir = getDirectionFromAngle(player.angle);
-        let playerFrame = 0;
-        
-        if (isMoving) {
-            const currentTime = Date.now();
-            playerFrame = Math.floor(currentTime / ANIMATION_SPEED) % 2;
-        } else {
-            playerFrame = 0;
-        }
-        
-        let playerImgToDraw = null;
-        if (playerImgs[playerDir] && playerImgs[playerDir][playerFrame]) {
-            playerImgToDraw = playerImgs[playerDir][playerFrame];
-        }
-        
-        if (playerImgToDraw && playerImgToDraw.complete && playerImgToDraw.src && playerImgToDraw.loaded !== false) {
-            try {
-                if (Math.floor(player.invulnerable / 5) % 2 === 0) {
-                    CTX.drawImage(playerImgToDraw, 
-                        player.x - PLAYER_SIZE, 
-                        player.y - PLAYER_SIZE, 
-                        PLAYER_SIZE * 2, 
-                        PLAYER_SIZE * 2
-                    );
-                }
-            } catch(e) {
-                if (!window.playerDrawErrorLogged) {
-                    console.log('玩家图片绘制失败，使用备用色块');
-                    window.playerDrawErrorLogged = true;
-                }
-                if (Math.floor(player.invulnerable / 5) % 2 === 0) {
-                    CTX.fillStyle = "#0ff";
-                    CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
-                }
-            }
-        } else {
-            if (Math.floor(player.invulnerable / 5) % 2 === 0) {
-                CTX.fillStyle = "#0ff";
-                CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
-            }
-        }
-    }
-
-    if (!player.isDead) {
-        ghosts.forEach((g, index) => {
-            const ghostDir = getDirectionFromAngle(g.angle);
-            let ghostFrame = Math.floor((animationFrame + index * 10) / ANIMATION_SPEED) % 2;
-            
-            let ghostImgToDraw = null;
-            if (ghostImgs[ghostDir] && ghostImgs[ghostDir][ghostFrame]) {
-                ghostImgToDraw = ghostImgs[ghostDir][ghostFrame];
-            }
-            
-            CTX.save();
-            CTX.translate(g.x, g.y);
-            CTX.shadowBlur = 25;
-            CTX.shadowColor = "#ff0000";
-            
-            if (ghostImgToDraw && ghostImgToDraw.complete && ghostImgToDraw.src && ghostImgToDraw.loaded !== false) {
-                try {
-                    CTX.drawImage(ghostImgToDraw, -GHOST_SIZE, -GHOST_SIZE, GHOST_SIZE * 2, GHOST_SIZE * 2);
-                } catch(e) {
-                    if (!window.ghostDrawErrorLogged) {
-                        console.log('鬼魂图片绘制失败，使用备用图形');
-                        window.ghostDrawErrorLogged = true;
-                    }
-                    drawGhostFallback();
-                }
-            } else {
-                drawGhostFallback();
-            }
-            
-            CTX.restore();
-        });
-    }
+if (isMoving) {
+const currentTime = Date.now();
+playerFrame = Math.floor(currentTime / ANIMATION_SPEED) % 2;
+} else {
+playerFrame = 0;
 }
 
+let playerImgToDraw = null;
+if (playerImgs[playerDir] && playerImgs[playerDir][playerFrame]) {
+playerImgToDraw = playerImgs[playerDir][playerFrame];
+}
+
+if (playerImgToDraw && playerImgToDraw.complete && playerImgToDraw.src && playerImgToDraw.loaded !== false) {
+try {
+if (Math.floor(player.invulnerable / 5) % 2 === 0) {
+CTX.drawImage(playerImgToDraw,
+player.x - PLAYER_SIZE,
+player.y - PLAYER_SIZE,
+PLAYER_SIZE * 2,
+PLAYER_SIZE * 2
+);
+}
+} catch(e) {
+if (!window.playerDrawErrorLogged) {
+console.log('玩家图片绘制失败，使用备用色块');
+window.playerDrawErrorLogged = true;
+}
+if (Math.floor(player.invulnerable / 5) % 2 === 0) {
+CTX.fillStyle = "#0ff";
+CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
+}
+}
+} else {
+if (Math.floor(player.invulnerable / 5) % 2 === 0) {
+CTX.fillStyle = "#0ff";
+CTX.fillRect(player.x - PLAYER_SIZE, player.y - PLAYER_SIZE, PLAYER_SIZE * 2, PLAYER_SIZE * 2);
+}
+}
+}
+if (!player.isDead) {
+ghosts.forEach((g, index) => {
+const ghostDir = getDirectionFromAngle(g.angle);
+let ghostFrame = Math.floor((animationFrame + index * 10) / ANIMATION_SPEED) % 2;
+
+let ghostImgToDraw = null;
+if (ghostImgs[ghostDir] && ghostImgs[ghostDir][ghostFrame]) {
+ghostImgToDraw = ghostImgs[ghostDir][ghostFrame];
+}
+
+CTX.save();
+CTX.translate(g.x, g.y);
+CTX.shadowBlur = 25;
+CTX.shadowColor = "#ff0000";
+
+if (ghostImgToDraw && ghostImgToDraw.complete && ghostImgToDraw.src && ghostImgToDraw.loaded !== false) {
+try {
+CTX.drawImage(ghostImgToDraw, -GHOST_SIZE, -GHOST_SIZE, GHOST_SIZE * 2, GHOST_SIZE * 2);
+} catch(e) {
+if (!window.ghostDrawErrorLogged) {
+console.log('鬼魂图片绘制失败，使用备用图形');
+window.ghostDrawErrorLogged = true;
+}
+drawGhostFallback();
+}
+} else {
+drawGhostFallback();
+}
+
+CTX.restore();
+});
+}
+}
 function drawFallbackBackground() {
-    const gradient = CTX.createRadialGradient(
-        CANVAS.width/2, CANVAS.height/2, 0,
-        CANVAS.width/2, CANVAS.height/2, CANVAS.width/2
-    );
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(1, '#0a0a1a');
-    CTX.fillStyle = gradient;
-    CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    
-    for(let i = 0; i < 50; i++) {
-        const x = Math.random() * CANVAS.width;
-        const y = Math.random() * CANVAS.height;
-        const size = Math.random() * 2 + 1;
-        CTX.fillStyle = `rgba(249, 215, 28, ${Math.random() * 0.5 + 0.5})`;
-        CTX.beginPath();
-        CTX.arc(x, y, size, 0, Math.PI * 2);
-        CTX.fill();
-    }
-}
+const gradient = CTX.createRadialGradient(
+CANVAS.width/2, CANVAS.height/2, 0,
+CANVAS.width/2, CANVAS.height/2, CANVAS.width/2
+);
+gradient.addColorStop(0, '#1a1a2e');
+gradient.addColorStop(1, '#0a0a1a');
+CTX.fillStyle = gradient;
+CTX.fillRect(0, 0, CANVAS.width, CANVAS.height);
 
+for(let i = 0; i < 50; i++) {
+const x = Math.random() * CANVAS.width;
+const y = Math.random() * CANVAS.height;
+const size = Math.random() * 2 + 1;
+CTX.fillStyle = `rgba(249, 215, 28, ${Math.random() * 0.5 + 0.5})`;
+CTX.beginPath();
+CTX.arc(x, y, size, 0, Math.PI * 2);
+CTX.fill();
+}
+}
 function drawGhostFallback() {
-    CTX.fillStyle = "#000";
-    CTX.beginPath();
-    CTX.arc(0, 0, GHOST_SIZE, 0, Math.PI * 2);
-    CTX.fill();
-    CTX.strokeStyle = "#f00";
-    CTX.lineWidth = 2;
-    CTX.beginPath();
-    CTX.moveTo(0, 0);
-    CTX.lineTo(20, 0);
-    CTX.stroke();
+CTX.fillStyle = "#000";
+CTX.beginPath();
+CTX.arc(0, 0, GHOST_SIZE, 0, Math.PI * 2);
+CTX.fill();
+CTX.strokeStyle = "#f00";
+CTX.lineWidth = 2;
+CTX.beginPath();
+CTX.moveTo(0, 0);
+CTX.lineTo(20, 0);
+CTX.stroke();
 }
-
 function isWall(x, y) {
-    if (x < 0 || x >= MASK_CANVAS.width || y < 0 || y >= MASK_CANVAS.height) return true;
-    
-    const pixelData = MASK_CTX.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-    const r = pixelData[0];
-    const g = pixelData[1];
-    const b = pixelData[2];
-    
-    const tolerance = 30;
-    const isGreen = Math.abs(r - WIN_COLOR.r) < tolerance && 
-                    Math.abs(g - WIN_COLOR.g) < tolerance && 
-                    Math.abs(b - WIN_COLOR.b) < tolerance;
-    
-    if (isGreen) {
-        const progress = collectedDots / totalDots;
-        if (progress >= 0.8) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    return r < 120;
+if (x < 0 || x >= MASK_CANVAS.width || y < 0 || y >= MASK_CANVAS.height) return true;
+
+const pixelData = MASK_CTX.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+const r = pixelData[0];
+const g = pixelData[1];
+const b = pixelData[2];
+
+const tolerance = 30;
+const isGreen = Math.abs(r - WIN_COLOR.r) < tolerance &&
+Math.abs(g - WIN_COLOR.g) < tolerance &&
+Math.abs(b - WIN_COLOR.b) < tolerance;
+
+if (isGreen) {
+const progress = collectedDots / totalDots;
+if (progress >= 0.8) {
+return false;
+} else {
+return true;
+}
 }
 
+return r < 120;
+}
 function checkCollision(x, y, size) {
-    const margin = 2;
-    const effectiveSize = HITBOX_SIZE + margin;
-    const r = effectiveSize / 2;
-    const centerX = x;
-    const centerY = y;
-    
-    return isWall(centerX, centerY) || 
-           isWall(centerX + r, centerY) || 
-           isWall(centerX - r, centerY) || 
-           isWall(centerX, centerY + r) || 
-           isWall(centerX, centerY - r);
-}
+const margin = 2;
+const effectiveSize = HITBOX_SIZE + margin;
+const r = effectiveSize / 2;
+const centerX = x;
+const centerY = y;
 
+return isWall(centerX, centerY) ||
+isWall(centerX + r, centerY) ||
+isWall(centerX - r, centerY) ||
+isWall(centerX, centerY + r) ||
+isWall(centerX, centerY - r);
+}
 function moveWithPhysics(entity, dx, dy, size) {
-    const steps = 4; 
-    let sx = dx / steps;
-    let sy = dy / steps;
-    for(let i = 0; i < steps; i++) {
-        if (!checkCollision(entity.x + sx, entity.y, HITBOX_SIZE)) {
-            entity.x += sx;
-        }
-        if (!checkCollision(entity.x, entity.y + sy, HITBOX_SIZE)) {
-            entity.y += sy;
-        }
-    }
+const steps = 4;
+let sx = dx / steps;
+let sy = dy / steps;
+for(let i = 0; i < steps; i++) {
+if (!checkCollision(entity.x + sx, entity.y, HITBOX_SIZE)) {
+entity.x += sx;
 }
-
+if (!checkCollision(entity.x, entity.y + sy, HITBOX_SIZE)) {
+entity.y += sy;
+}
+}
+}
 function findSafeSpot(sx, sy, size) {
-    let r = 0;
-    while(r < 500) {
-        for(let dx = -r; dx <= r; dx += 20) {
-            for(let dy = -r; dy <= r; dy += 20) {
-                if(!checkCollision(sx + dx, sy + dy, HITBOX_SIZE)) {
-                    return {x: sx + dx, y: sy + dy};
-                }
-            }
-        }
-        r += 50;
-    }
-    return {x: sx, y: sy};
+let r = 0;
+while(r < 500) {
+for(let dx = -r; dx <= r; dx += 20) {
+for(let dy = -r; dy <= r; dy += 20) {
+if(!checkCollision(sx + dx, sy + dy, HITBOX_SIZE)) {
+return {x: sx + dx, y: sy + dy};
 }
-
+}
+}
+r += 50;
+}
+return {x: sx, y: sy};
+}
 // ==================== ⚡ 玩家碰撞处理：防重复触发，防音效堆叠 ====================
 function playerHit() {
-    // ==================== 🔧 核心防护：如果已经死亡，直接返回，不再执行任何操作 ====================
-    if (player.isDead) {
-        console.log('⚠️ 玩家已死亡，playerHit 被阻止重复触发');
-        return;
-    }
-    
-    // ==================== 🔧 设置死亡标记，阻止后续碰撞检测 ====================
-    player.isDead = true;
-    gameRunning = false;
-    lives--;
-    
-    // ==================== 🎵 只播放一次碰撞音效 ====================
-    if (!SFX.collision.playing) {
-        playSound('collision');
-        SFX.collision.playing = true; // 防止重复播放标记
-    }
-    
-    updateHUD();
-    
-    if (lives <= 0) {
-        setTimeout(() => {
-            if (bgMusicElement && musicPlaying) {
-                bgMusicElement.pause();
-            }
-            // ==================== 🎵 游戏结束音效也只播放一次 ====================
-            if (!SFX.gameOver.playing) {
-                playSound('gameOver');
-                SFX.gameOver.playing = true;
-            }
-            showResult(getText('game_over'), getText('btn_retry'), () => location.reload());
-        }, 800);
-    } else {
-        player.invulnerable = 120;
-        setTimeout(() => {
-            // ==================== 🔧 重置标记，准备复活 ====================
-            SFX.collision.playing = false;
-            
-            let safe = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
-            player.x = safe.x;
-            player.y = safe.y;
-            
-            ghosts.forEach((g, index) => {
-                let ghostSafe = findSafeSpot(CANVAS.width - 200, 200 + index*150, HITBOX_SIZE);
-                g.x = ghostSafe.x;
-                g.y = ghostSafe.y;
-            });
-            
-            alert(getText('hit_warning'));
-            player.isDead = false; // 重置死亡状态
-            gameRunning = true;
-            isPaused = false;
-        }, 800);
-    }
+// ==================== 🔧 核心防护：如果已经死亡，直接返回，不再执行任何操作 ====================
+if (player.isDead) {
+console.log('⚠️ 玩家已死亡，playerHit 被阻止重复触发');
+return;
 }
 
+// ==================== 🔧 设置死亡标记，阻止后续碰撞检测 ====================
+player.isDead = true;
+gameRunning = false;
+lives--;
+
+// ==================== 🎵 只播放一次碰撞音效 ====================
+if (!SFX.collision.playing) {
+playSound('collision');
+SFX.collision.playing = true; // 防止重复播放标记
+}
+
+updateHUD();
+
+if (lives <= 0) {
+setTimeout(() => {
+if (bgMusicElement && musicPlaying) {
+bgMusicElement.pause();
+}
+// ==================== 🎵 游戏结束音效也只播放一次 ====================
+if (!SFX.gameOver.playing) {
+playSound('gameOver');
+SFX.gameOver.playing = true;
+}
+showResult(getText('game_over'), getText('btn_retry'), () => location.reload());
+}, 800);
+} else {
+player.invulnerable = 120;
+setTimeout(() => {
+// ==================== 🔧 重置标记，准备复活 ====================
+SFX.collision.playing = false;
+
+let safe = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
+player.x = safe.x;
+player.y = safe.y;
+
+ghosts.forEach((g, index) => {
+let ghostSafe = findSafeSpot(CANVAS.width - 200, 200 + index*150, HITBOX_SIZE);
+g.x = ghostSafe.x;
+g.y = ghostSafe.y;
+});
+
+alert(getText('hit_warning'));
+player.isDead = false; // 重置死亡状态
+gameRunning = true;
+isPaused = false;
+}, 800);
+}
+}
 function levelWin() {
-    isPaused = true;
-    gameRunning = false;
-    const resultModal = document.getElementById('result-modal');
-    if (resultModal) resultModal.classList.add('hidden');
-    showLevelStory(currentLevel);
+isPaused = true;
+gameRunning = false;
+const resultModal = document.getElementById('result-modal');
+if (resultModal) resultModal.classList.add('hidden');
+showLevelStory(currentLevel);
 }
-
 function showLevelStory(level) {
-    const modal = document.getElementById('level-story-modal');
-    const img = document.getElementById('story-bg-img');
-    const content = document.getElementById('level-story-content');
-    const btn = document.getElementById('story-btn-text');
-    
-    if (!modal || !content || !btn) return;
-    
-    btn.textContent = getText('next_btn');
-    
-    const storyIndex = level - 1;
-    if (levelStoryImgs[storyIndex] && levelStoryImgs[storyIndex].loaded) {
-        img.src = levelStoryImgs[storyIndex].src;
-        img.style.display = 'block';
-    } else {
-        img.style.display = 'none';
-    }
-    
-    const levelStory = getText(`level${level}_complete`);
-    content.textContent = levelStory;
-    
-    modal.classList.remove('hidden');
-    
-    if (level === 3) {
-        if (bgMusicElement && musicPlaying) {
-            bgMusicElement.pause();
-        }
-        setTimeout(() => playSound('gameWin'), 500);
-    }
+const modal = document.getElementById('level-story-modal');
+const img = document.getElementById('story-bg-img');
+const content = document.getElementById('level-story-content');
+const btn = document.getElementById('story-btn-text');
+
+if (!modal || !content || !btn) return;
+
+btn.textContent = getText('next_btn');
+
+const storyIndex = level - 1;
+if (levelStoryImgs[storyIndex] && levelStoryImgs[storyIndex].loaded) {
+img.src = levelStoryImgs[storyIndex].src;
+img.style.display = 'block';
+} else {
+img.style.display = 'none';
 }
 
+const levelStory = getText(`level${level}_complete`);
+content.textContent = levelStory;
+
+modal.classList.remove('hidden');
+
+if (level === 3) {
+if (bgMusicElement && musicPlaying) {
+bgMusicElement.pause();
+}
+setTimeout(() => playSound('gameWin'), 500);
+}
+}
 function closeLevelStory() {
-    const modal = document.getElementById('level-story-modal');
-    if (modal) modal.classList.add('hidden');
-    
-    if (currentLevel < 3) {
-        if (bgMusicElement && musicPlaying && bgMusicElement.paused) {
-            bgMusicElement.play().catch(e => console.log('恢复音乐失败', e));
-        }
-        initLevel(currentLevel + 1);
-    } else {
-        showEndingScreen();
-    }
-}
+const modal = document.getElementById('level-story-modal');
+if (modal) modal.classList.add('hidden');
 
+if (currentLevel < 3) {
+if (bgMusicElement && musicPlaying && bgMusicElement.paused) {
+bgMusicElement.play().catch(e => console.log('恢复音乐失败', e));
+}
+initLevel(currentLevel + 1);
+} else {
+showEndingScreen();
+}
+}
 function showStory(text) {
-    isPaused = true;
-    const modal = document.getElementById('story-modal');
-    const content = document.getElementById('story-content');
-    if (modal && content) {
-        content.innerText = text;
-        modal.classList.remove('hidden');
-    }
+isPaused = true;
+const modal = document.getElementById('story-modal');
+const content = document.getElementById('story-content');
+if (modal && content) {
+content.innerText = text;
+modal.classList.remove('hidden');
 }
-
+}
 function closeStory() {
-    const modal = document.getElementById('story-modal');
-    if (modal) modal.classList.add('hidden');
-    isPaused = false;
+const modal = document.getElementById('story-modal');
+if (modal) modal.classList.add('hidden');
+isPaused = false;
 }
-
 function showResult(title, btnText, callback) {
-    const modal = document.getElementById('result-modal');
-    const titleEl = document.getElementById('result-title');
-    const btn = document.getElementById('next-btn');
-    
-    if (modal && titleEl && btn) {
-        titleEl.innerText = title;
-        btn.innerText = btnText;
-        btn.onclick = callback;
-        modal.classList.remove('hidden');
-    }
-}
+const modal = document.getElementById('result-modal');
+const titleEl = document.getElementById('result-title');
+const btn = document.getElementById('next-btn');
 
+if (modal && titleEl && btn) {
+titleEl.innerText = title;
+btn.innerText = btnText;
+btn.onclick = callback;
+modal.classList.remove('hidden');
+}
+}
 function showEndingScreen() {
-    const container = document.getElementById('canvas-container');
-    if (container) container.style.display = 'none';
-    
-    const musicBtn = document.getElementById('music-btn');
-    if (musicBtn) musicBtn.style.display = 'none';
-    
-    const creditsContent = document.getElementById('credits-content');
-    if (creditsContent) {
-        creditsContent.innerHTML = getText('ending_credits');
-    }
-    
-    const endingScreen = document.getElementById('ending-screen');
-    if (endingScreen) {
-        endingScreen.classList.remove('hidden');
-    }
-    
-    // ==================== 🎵 胜利音效只播放一次 ====================
-    playSound('gameWin');
-    
-    setTimeout(() => {
-        if (confirm(getText('btn_retry') + '?')) {
-            location.reload();
-        }
-    }, 45000);
+const container = document.getElementById('canvas-container');
+if (container) container.style.display = 'none';
+
+const musicBtn = document.getElementById('music-btn');
+if (musicBtn) musicBtn.style.display = 'none';
+
+const creditsContent = document.getElementById('credits-content');
+if (creditsContent) {
+creditsContent.innerHTML = getText('ending_credits');
 }
 
+const endingScreen = document.getElementById('ending-screen');
+if (endingScreen) {
+endingScreen.classList.remove('hidden');
+}
+
+// ==================== 🎵 胜利音效只播放一次 ====================
+playSound('gameWin');
+
+setTimeout(() => {
+if (confirm(getText('btn_retry') + '?')) {
+location.reload();
+}
+}, 45000);
+}
 function updateHUD() {
-    const livesEl = document.getElementById('lives');
-    const collectEl = document.getElementById('collect-text');
-    const levelEl = document.getElementById('level-num');
-    
-    if (livesEl) {
-        let hearts = "";
-        for(let i = 0; i < lives; i++) hearts += "❤️";
-        livesEl.innerHTML = hearts;
-    }
-    
-    if (collectEl) {
-        let pct = Math.floor((collectedDots / totalDots) * 100);
-        collectEl.innerText = isNaN(pct) ? "0%" : pct + "%";
-    }
-    
-    if (levelEl) {
-        levelEl.innerText = currentLevel;
-    }
+const livesEl = document.getElementById('lives');
+const collectEl = document.getElementById('collect-text');
+const levelEl = document.getElementById('level-num');
+
+if (livesEl) {
+let hearts = "";
+for(let i = 0; i < lives; i++) hearts += "❤️";
+livesEl.innerHTML = hearts;
 }
 
+if (collectEl) {
+let pct = Math.floor((collectedDots / totalDots) * 100);
+collectEl.innerText = isNaN(pct) ? "0%" : pct + "%";
+}
+
+if (levelEl) {
+levelEl.innerText = currentLevel;
+}
+}
 window.addEventListener('keydown', e => {
-    keys[e.key] = true;
-    if (e.key === ' ') {
-        e.preventDefault();
-        toggleMusic();
-    }
+keys[e.key] = true;
+if (e.key === ' ') {
+e.preventDefault();
+toggleMusic();
+}
 });
 window.addEventListener('keyup', e => keys[e.key] = false);
-
 const joyZone = document.getElementById('joystick-zone');
 const joyKnob = document.getElementById('joystick-knob');
-
 if (joyZone && joyKnob) {
-    joyZone.addEventListener('touchstart', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        let touch = e.touches[0];
-        let rect = joyZone.getBoundingClientRect();
-        joystick.active = true;
-        joystick.originX = rect.left + rect.width/2;
-        joystick.originY = rect.top + rect.height/2;
-        updateJoystick(touch.clientX, touch.clientY);
-    }, {passive: false, capture: true});
-
-    joyZone.addEventListener('touchmove', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        if(joystick.active) updateJoystick(e.touches[0].clientX, e.touches[0].clientY);
-    }, {passive: false, capture: true});
-
-    joyZone.addEventListener('touchend', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        joystick.active = false;
-        joystick.dx = 0;
-        joystick.dy = 0;
-        joyKnob.style.transform = `translate(-50%, -50%)`;
-        isMoving = false;
-    }, {passive: false, capture: true});
+joyZone.addEventListener('touchstart', e => {
+e.preventDefault();
+e.stopPropagation();
+let touch = e.touches[0];
+let rect = joyZone.getBoundingClientRect();
+joystick.active = true;
+joystick.originX = rect.left + rect.width/2;
+joystick.originY = rect.top + rect.height/2;
+updateJoystick(touch.clientX, touch.clientY);
+}, {passive: false, capture: true});
+joyZone.addEventListener('touchmove', e => {
+e.preventDefault();
+e.stopPropagation();
+if(joystick.active) updateJoystick(e.touches[0].clientX, e.touches[0].clientY);
+}, {passive: false, capture: true});
+joyZone.addEventListener('touchend', e => {
+e.preventDefault();
+e.stopPropagation();
+joystick.active = false;
+joystick.dx = 0;
+joystick.dy = 0;
+joyKnob.style.transform = `translate(-50%, -50%)`;
+isMoving = false;
+}, {passive: false, capture: true});
 }
-
 function updateJoystick(x, y) {
-    let maxDist = 30;
-    let dx = x - joystick.originX;
-    let dy = y - joystick.originY;
-    let dist = Math.hypot(dx, dy);
-    
-    if(dist > maxDist) {
-        dx = (dx/dist) * maxDist;
-        dy = (dy/dist) * maxDist;
-    }
-    joystick.dx = dx / maxDist;
-    joystick.dy = dy / maxDist;
-    
-    joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-    isMoving = Math.abs(joystick.dx) > 0.1 || Math.abs(joystick.dy) > 0.1;
-}
+let maxDist = 30;
+let dx = x - joystick.originX;
+let dy = y - joystick.originY;
+let dist = Math.hypot(dx, dy);
 
+if(dist > maxDist) {
+dx = (dx/dist) * maxDist;
+dy = (dy/dist) * maxDist;
+}
+joystick.dx = dx / maxDist;
+joystick.dy = dy / maxDist;
+
+joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+isMoving = Math.abs(joystick.dx) > 0.1 || Math.abs(joystick.dy) > 0.1;
+}
 function gameLoop() {
-    animationFrame++;
-    update();
-    draw();
-    frameId = requestAnimationFrame(gameLoop);
+animationFrame++;
+update();
+draw();
+frameId = requestAnimationFrame(gameLoop);
 }
-
 bgMusicElement = document.getElementById('bgMusic');
 if (bgMusicElement) {
-    bgMusicElement.oncanplaythrough = () => {
-        bgMusicElement.loaded = true;
-        console.log('✅ 背景音乐加载完成');
-    };
-    bgMusicElement.onerror = () => {
-        bgMusicElement.loaded = false;
-        console.error('❌ 背景音乐加载失败');
-    };
-    bgMusicElement.volume = 0.3;
+bgMusicElement.oncanplaythrough = () => {
+bgMusicElement.loaded = true;
+console.log('✅ 背景音乐加载完成');
+};
+bgMusicElement.onerror = () => {
+bgMusicElement.loaded = false;
+console.error('❌ 背景音乐加载失败');
+};
+bgMusicElement.volume = 0.3;
 }
-
 Object.keys(SFX).forEach(key => {
-    if (SFX[key] instanceof Audio) {
-        const sound = SFX[key];
-        sound.oncanplaythrough = () => {
-            sound.loaded = true;
-            console.log(`✅ 音效 ${key} 加载完成`);
-        };
-        sound.onerror = () => {
-            sound.loaded = false;
-            console.error(`❌ 音效 ${key} 加载失败`);
-        };
-        sound.volume = SFX.volume;
-        sound.preload = 'auto';
-    }
+if (SFX[key] instanceof Audio) {
+const sound = SFX[key];
+sound.oncanplaythrough = () => {
+sound.loaded = true;
+console.log(`✅ 音效 ${key} 加载完成`);
+};
+sound.onerror = () => {
+sound.loaded = false;
+console.error(`❌ 音效 ${key} 加载失败`);
+};
+sound.volume = SFX.volume;
+sound.preload = 'auto';
+}
 });
-
 levelStoryImgs = [];
 for(let i = 1; i <= 3; i++) {
-    const img = new Image();
-    img.loaded = false;
-    img.onload = async () => {
-        try {
-            await img.decode();
-            img.loaded = true;
-            console.log(`✅ 故事图${i}解码成功`);
-        } catch(e) {
-            console.error(`❌ 故事图${i}解码失败:`, e);
-            img.loaded = false;
-        }
-    };
-    img.onerror = () => {
-        console.error(`❌ 故事图${i}加载失败`);
-        img.loaded = false;
-    };
-    img.src = `story_bg${i}.jpg`;
-    levelStoryImgs.push(img);
+const img = new Image();
+img.loaded = false;
+img.onload = async () => {
+try {
+await img.decode();
+img.loaded = true;
+console.log(`✅ 故事图${i}解码成功`);
+} catch(e) {
+console.error(`❌ 故事图${i}解码失败:`, e);
+img.loaded = false;
 }
-
+};
+img.onerror = () => {
+console.error(`❌ 故事图${i}加载失败`);
+img.loaded = false;
+};
+img.src = `story_bg${i}.jpg`;
+levelStoryImgs.push(img);
+}
 const directions = ['up', 'down', 'left', 'right'];
 directions.forEach(dir => {
-    playerImgs[dir] = [];
-    for(let i = 0; i < 2; i++) {
-        const img = new Image();
-        img.loaded = false;
-        img.onload = async () => {
-            try {
-                await img.decode();
-                img.loaded = true;
-                console.log(`✅ 玩家${dir}${i+1}解码成功`);
-            } catch(e) {
-                console.error(`❌ 玩家${dir}${i+1}解码失败:`, e);
-                img.loaded = false;
-            }
-        };
-        img.onerror = () => {
-            console.error(`❌ 玩家${dir}${i+1}加载失败`);
-            img.loaded = false;
-        };
-        img.src = `p_${dir}${i+1}.png`;
-        playerImgs[dir].push(img);
-    }
+playerImgs[dir] = [];
+for(let i = 0; i < 2; i++) {
+const img = new Image();
+img.loaded = false;
+img.onload = async () => {
+try {
+await img.decode();
+img.loaded = true;
+console.log(`✅ 玩家${dir}${i+1}解码成功`);
+} catch(e) {
+console.error(`❌ 玩家${dir}${i+1}解码失败:`, e);
+img.loaded = false;
+}
+};
+img.onerror = () => {
+console.error(`❌ 玩家${dir}${i+1}加载失败`);
+img.loaded = false;
+};
+img.src = `p_${dir}${i+1}.png`;
+playerImgs[dir].push(img);
+}
 });
-
 directions.forEach(dir => {
-    ghostImgs[dir] = [];
-    for(let i = 0; i < 2; i++) {
-        const img = new Image();
-        img.loaded = false;
-        img.onload = async () => {
-            try {
-                await img.decode();
-                img.loaded = true;
-                console.log(`✅ 鬼魂${dir}${i+1}解码成功`);
-            } catch(e) {
-                console.error(`❌ 鬼魂${dir}${i+1}解码失败:`, e);
-                img.loaded = false;
-            }
-        };
-        img.onerror = () => {
-            console.error(`❌ 鬼魂${dir}${i+1}加载失败`);
-            img.loaded = false;
-        };
-        img.src = `g_${dir}${i+1}.png`;
-        ghostImgs[dir].push(img);
-    }
+ghostImgs[dir] = [];
+for(let i = 0; i < 2; i++) {
+const img = new Image();
+img.loaded = false;
+img.onload = async () => {
+try {
+await img.decode();
+img.loaded = true;
+console.log(`✅ 鬼魂${dir}${i+1}解码成功`);
+} catch(e) {
+console.error(`❌ 鬼魂${dir}${i+1}解码失败:`, e);
+img.loaded = false;
+}
+};
+img.onerror = () => {
+console.error(`❌ 鬼魂${dir}${i+1}加载失败`);
+img.loaded = false;
+};
+img.src = `g_${dir}${i+1}.png`;
+ghostImgs[dir].push(img);
+}
 });
-
 window.addEventListener('load', () => {
-    console.log('🎮 页面加载完成，开始初始化资源...');
-    console.log(`📂 当前页面路径: ${window.location.href}`);
-    console.log(`📁 当前目录: ${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}`);
-    
-    if (!window.gameInitialized) {
-        document.getElementById('canvas-container').classList.remove('hidden');
-        document.getElementById('joystick-zone').classList.remove('hidden');
-        document.getElementById('music-btn').classList.remove('hidden');
-        document.getElementById('start-screen').classList.remove('hidden');
-        window.gameInitialized = true;
-    }
-    
-    document.addEventListener('touchmove', e => e.preventDefault(), {passive: false});
-});
+console.log('🎮 页面加载完成，开始初始化资源...');
+console.log(`📂 当前页面路径: ${window.location.href}`);
+console.log(`📁 当前目录: ${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}`);
 
+if (!window.gameInitialized) {
+document.getElementById('canvas-container').classList.remove('hidden');
+document.getElementById('joystick-zone').classList.remove('hidden');
+document.getElementById('music-btn').classList.remove('hidden');
+document.getElementById('start-screen').classList.remove('hidden');
+window.gameInitialized = true;
+}
+
+document.addEventListener('touchmove', e => e.preventDefault(), {passive: false});
+});
 console.log('游戏初始化完成。需要文件:');
 console.log('背景: bg_level1.jpg, bg_level2.jpg, bg_level3.jpg');
 console.log('遮罩: mask_level1.jpg, mask_level2.jpg, mask_level3.jpg');
@@ -1612,7 +1511,6 @@ console.log('玩家: p_up1.png, p_up2.png, p_down1.png, p_down2.png, p_left1.png
 console.log('鬼魂: g_up1.png, g_up2.png, g_down1.png, g_down2.png, g_left1.png, g_left2.png, g_right1.png, g_right2.png');
 console.log('故事: story_bg1.jpg, story_bg2.jpg, story_bg3.jpg');
 console.log('结局: ending_bg.jpg (用于多语言电影谢幕)');
-
 </script>
 </body>
 </html>
