@@ -413,7 +413,6 @@ ending_credits: `
 <br><br>
 <p>Kehadiran bangunan ini membangkitkan rasa takzim terhadap kesinambungan intelektual</p>
 <p>yang telah memartabatkan pendidikan geografi tanah air selama lebih satu abad.</p>
-<br><br>
 <p>Ia berdiri teguh sebagai simbol kebanggaan yang menyatukan</p>
 <p>nostalgia perjuangan pendidik terdahulu dengan aspirasi akademik mahasiswa masa kini.</p>
 <br><br>
@@ -486,11 +485,12 @@ const CANVAS = document.getElementById('gameCanvas');
 const CTX = CANVAS.getContext('2d');
 const MASK_CANVAS = document.createElement('canvas');
 const MASK_CTX = MASK_CANVAS.getContext('2d', { willReadFrequently: true });
-// ==================== ⚡ 关卡速度配置：已降速 ====================
+// ==================== ⚡ 极致降速配置 ====================
+// p_speed (玩家速度), g_speed (鬼魂速度)
 const LEVEL_CONFIG = {
-1: { p_speed: 1.8, g_speed: 0.6 },  // ⚡ 极大幅度降速：确保所有人都能玩
-2: { p_speed: 2.0, g_speed: 0.9 },  // ⚡ 适度提速
-3: { p_speed: 2.3, g_speed: 1.2 }   // ⚡ 最终关卡，比之前最慢的还要慢一点
+1: { p_speed: 1.5, g_speed: 0.4 },  // ⚡ Level 1: 极慢，教程级速度
+2: { p_speed: 1.7, g_speed: 0.7 },  // ⚡ Level 2: 依然很慢
+3: { p_speed: 2.0, g_speed: 1.0 }   // ⚡ Level 3: 正常偏慢
 };
 const PLAYER_SIZE = 24;
 const HITBOX_SIZE = 14;
@@ -510,7 +510,7 @@ let musicPlaying = false;
 let animationFrame = 0;
 let lastAnimationTime = 0;
 let isMoving = false;
-// ==================== 🔧 死亡状态标记：确保只触发一次 ====================
+// ==================== 🔧 死亡状态标记 ====================
 let player = {
 x: 0,
 y: 0,
@@ -709,13 +709,13 @@ player.invulnerable = 0;
 player.angle = 0;
 player.isDead = false;
 ghosts = [];
-// ==================== ⚡ 难度升级：第一关有2个鬼，第二关3个，第三关4个 ====================
-let ghostCount = currentLevel + 1;
+// ==================== ⚡ 鬼魂数量: L1=1, L2=2, L3=3 ====================
+let ghostCount = currentLevel;
 
 for(let i = 0; i < ghostCount; i++) {
-// ==================== ⚡ 位置调整：鬼魂更靠近中心"隘口" ====================
-let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120; // 更靠近中心区域
-let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80; // 在必经之路上形成交叉巡逻
+// ==================== ⚡ 鬼魂初始位置 ====================
+let ghostSpawnX = CANVAS.width / 2 + 150 + i * 120;
+let ghostSpawnY = CANVAS.height / 2 - 100 + i * 80;
 
 let gPos = findSafeSpot(ghostSpawnX, ghostSpawnY, HITBOX_SIZE);
 
@@ -1156,23 +1156,20 @@ r += 50;
 }
 return {x: sx, y: sy};
 }
-// ==================== ⚡ 玩家碰撞处理：防重复触发，防音效堆叠 ====================
+// ==================== ⚡ 玩家碰撞处理 ====================
 function playerHit() {
-// ==================== 🔧 核心防护：如果已经死亡，直接返回，不再执行任何操作 ====================
 if (player.isDead) {
 console.log('⚠️ 玩家已死亡，playerHit 被阻止重复触发');
 return;
 }
 
-// ==================== 🔧 设置死亡标记，阻止后续碰撞检测 ====================
 player.isDead = true;
 gameRunning = false;
 lives--;
 
-// ==================== 🎵 只播放一次碰撞音效 ====================
 if (!SFX.collision.playing) {
 playSound('collision');
-SFX.collision.playing = true; // 防止重复播放标记
+SFX.collision.playing = true;
 }
 
 updateHUD();
@@ -1182,7 +1179,6 @@ setTimeout(() => {
 if (bgMusicElement && musicPlaying) {
 bgMusicElement.pause();
 }
-// ==================== 🎵 游戏结束音效也只播放一次 ====================
 if (!SFX.gameOver.playing) {
 playSound('gameOver');
 SFX.gameOver.playing = true;
@@ -1192,7 +1188,6 @@ showResult(getText('game_over'), getText('btn_retry'), () => location.reload());
 } else {
 player.invulnerable = 120;
 setTimeout(() => {
-// ==================== 🔧 重置标记，准备复活 ====================
 SFX.collision.playing = false;
 
 let safe = findSafeSpot(100, CANVAS.height/2, HITBOX_SIZE);
@@ -1206,7 +1201,7 @@ g.y = ghostSafe.y;
 });
 
 alert(getText('hit_warning'));
-player.isDead = false; // 重置死亡状态
+player.isDead = false;
 gameRunning = true;
 isPaused = false;
 }, 800);
@@ -1305,7 +1300,6 @@ if (endingScreen) {
 endingScreen.classList.remove('hidden');
 }
 
-// ==================== 🎵 胜利音效只播放一次 ====================
 playSound('gameWin');
 
 setTimeout(() => {
